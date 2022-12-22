@@ -17,15 +17,15 @@ mutate_cumsum_gdd(
 )
 }
 \arguments{
-\item{df}{(data.frame) table with columns for date (or date including time), min and max temperatures}
+\item{df}{(data.frame) table with columns for date (or date including time for hourly data), min and max temperatures}
 
-\item{date}{non-quoted column name containing dates (date column type)}
+\item{date}{non-quoted column name containing dates (\code{date} column type)}
 
 \item{t.min}{non-quoted column name containing minimum day temperatures (numeric column)}
 
 \item{t.max}{non-quoted column name containing maximum day temperatures (numeric column)}
 
-\item{t.ceiling}{(dbl) ceiling temperature value for t.max and t.min}
+\item{t.ceiling}{(dbl) ceiling temperature value for \code{t.max} and \code{t.min}}
 
 \item{t.base}{(dbl) base temperature}
 
@@ -37,17 +37,19 @@ as daily data otherwise}
 \item{values_to}{(chr) name of the new column to store the output}
 }
 \value{
-(data.frame) table copying df but adding a numerical column for the cumulative
+(data.frame) table copying \code{df} but adding a numerical column for the cumulative
 sum of growing degree-days
 }
 \description{
-The input data frame must includes columns for date, min and max
+The input data frame must include columns for date, min and max
 temperatures. Calculations are done by groups in grouped data frames.
 Thus, the data.frame should be grouped by relevant variables such as
-years and geographical locations.
-In each group of the data frame, every time point from 1st January to last
-date of interest must be represented by exactly one row (no missing time
-point). NAs are not supported for the min and max temperatures.
+years and geographical locations otherwise it is assumed that there is only
+1 location.
+In each group of the data frame or in the full data frame if no groups are
+defined, every time point from 1st January to last date of interest
+must be represented by exactly one row (no missing time
+point). \code{NA}s are not supported for the min and max temperatures.
 Then, the function calculates the growing degree-days independently for
 each row as defined in \code{\link[=growing_degree_days]{growing_degree_days()}}.
 Finally it calculates the cumulative sum in a new column.
