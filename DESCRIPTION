@@ -1,19 +1,28 @@
 Package: zeppr
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Data Processing for Plant Protection Research (Beta!)
 Version: 0.1.0
 Author: Dr. Fontaine
 Maintainer: Dr. Fontaine <fontaine@zepp.info>
 Description: Collection of functions for processing and analyzing plant 
-    protection projects
+    protection projects. It is highly focused to meet the requirements of a 
+    particular team of people but may be useful to more. This piece of Software 
+    is provided as it is without guatantie of functionality or correctness. 
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
-    dplyr,
-    magrittr,
-    readxl,
-    slider,
-    stringr,
-    tibble
+    dplyr (>= 1.0),
+    lubridate (>= 1.9.0),
+    magrittr (>= 2.0),
+    readxl (>= 1.4),
+    rlang (>= 1.0),
+    slider (>= 0.3),
+    stringr (>= 0.5),
+    tibble (>= 3.1),
+    tidyselect (>= 1.2.0)
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

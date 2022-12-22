@@ -6,10 +6,10 @@
 #' sum(element 1, element 2, ... element i). Then, each value is normalized as a
 #' percentage by dividing the value by the sum of all elements.
 #'
-#' @param values vector of numerical values (numeric)
-#' @param normalize returns normalized cumulative sum if TRUE, simple cumulative sum otherwise (boolean)
-#' @param na.replace numeric value used to replace NA values,
-#' @return numeric vector of the normalized cumulative sum (from 0 to 1)
+#' @param values (numeric) vector of numerical values
+#' @param normalize (boolean) returns normalized cumulative sum if `TRUE`, simple cumulative sum otherwise
+#' @param na.replace (dbl) numeric value used to replace `NA` values (default=`NA` to not replace)
+#' @return (numeric) vector of the cumulative sum normalized by default from 0 to 1
 #' @examples
 #' # Simple case
 #' normalized_cumsum(c(1,2,3,4,5))
