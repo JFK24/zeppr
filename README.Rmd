@@ -77,7 +77,5 @@ Functions to process weather data from the ISIP service.
 ```{r}
 # See the following functions:
 # read_isip_hourly_weather_data()
-# read_isip_hourly_to_daily_weather_data()
-# mutate_isip_daily_weather_with_cumsum_gdd()
-# mutate_isip_hourly_weather_with_cumsum_gdd()
+# mutate_isip_weather_with_cumsum_gdd()
 ```

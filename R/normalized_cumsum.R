@@ -1,10 +1,11 @@
 # ==============================================================================
 #' Normalized Cumulative Sum
 #'
-#' First The cumulative sum includes all values starting from the 1st element.
-#' For example, cumulative sum of element i is equal to
-#' sum(element 1, element 2, ... element i). Then, each value is normalized as a
-#' percentage by dividing the value by the sum of all elements.
+#' From an input vector of numerical values, this function first calculates the
+#' cumulative sum for each element of the vector. An element is summed to all
+#' its predecessors in the vector (the order of the input vector is used).
+#' Then, it divides the new values by the sum of all values.
+#' The resulting values will range from 0 to 1 as percentages.
 #'
 #' @param values (numeric) vector of numerical values
 #' @param normalize (boolean) returns normalized cumulative sum if `TRUE`, simple cumulative sum otherwise

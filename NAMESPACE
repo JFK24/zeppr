@@ -2,10 +2,8 @@
 
 export(growing_degree_days)
 export(mutate_cumsum_gdd)
-export(mutate_isip_daily_weather_with_cumsum_gdd)
-export(mutate_isip_hourly_weather_with_cumsum_gdd)
+export(mutate_isip_weather_with_cumsum_gdd)
 export(normalized_cumsum)
-export(read_isip_hourly_to_daily_weather_data)
 export(read_isip_hourly_weather_data)
 importFrom(magrittr,"%>%")
 importFrom(rlang,":=")

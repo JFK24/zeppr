@@ -6,13 +6,16 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-This R package provides a collection of R functions to process plant
+The zeppr package provides a collection of R functions to process plant
 protection data. It is actually made for a particular institute in
-Germany. It is a beta version provided AS IS without any guaranty or
-support. It is available for non-commercial use at your own risks.
-Contact me for commercial use.
+Germany but may be useful for more persons. It is a beta version
+provided AS IS without any guaranty or support. It is available for
+non-commercial use at your own risks. Contact me for commercial use.
 
 ## Installation
+
+The library `devtools` is required to install the `zeppr` package.
+Uncomment the first line of code below to install it if necessaray.
 
 You can install the development version of zeppr from
 [GitHub](https://github.com/) with:
@@ -22,17 +25,14 @@ You can install the development version of zeppr from
 devtools::install_github("JFK24/zeppr")
 ```
 
-The library devtools is required to install the package. Uncomment the
-first line of code above to install it if necessaray.
-
 ## Examples
 
 ### Normalized cumulative sum
 
-From a vector of values, first calculates the the cumulative sum for
-each element from the 1st element. Then, divides the values by the sum
-of all values. The resulting values will range from 0 to 1 (as
-percentages).
+From an input vector of numerical values, first calculates the the
+cumulative sum for each element from the 1st element (the order of the
+input vector is used). Then, divides the values by the sum of all
+values. The resulting values will range from 0 to 1 as percentages.
 
 ``` r
 library(zeppr)
@@ -49,17 +49,17 @@ vectors are assumed to be complete**: no missing time points and no
 missing temperature values.
 
 ``` r
+# See the following functions:
 # growing_degree_days()
 # mutate_cumsum_gdd()
 ```
 
 ### ISIP weather data processing
 
-TO DO
+Functions to process weather data from the ISIP service.
 
 ``` r
+# See the following functions:
 # read_isip_hourly_weather_data()
-# read_isip_hourly_to_daily_weather_data()
-# mutate_isip_daily_weather_with_cumsum_gdd()
-# mutate_isip_hourly_weather_with_cumsum_gdd()
+# mutate_isip_weather_with_cumsum_gdd()
 ```

@@ -2,30 +2,46 @@
 % Please edit documentation in R/read_isip_weather_data.R
 \name{read_isip_hourly_weather_data}
 \alias{read_isip_hourly_weather_data}
-\title{Reads ISIP hourly weather export data file}
+\title{Reads ISIP hourly weather data file}
 \usage{
-read_isip_hourly_weather_data(excel.path)
+read_isip_hourly_weather_data(
+  excel.path,
+  returns.daily.data = FALSE,
+  drop.irrelvant.cols = TRUE
+)
 }
 \arguments{
 \item{excel.path}{(chr) path to ISIP hourly weather export data file (Excel
 file). ISIP's Excel Data format as of Dec 2022.}
+
+\item{returns.daily.data}{(boolean) returns daily data if \code{TRUE}, hourly data otherwise}
+
+\item{drop.irrelvant.cols}{(boolean) remove irrelevant columns if \code{TRUE}, keep all columns otherwise}
 }
 \value{
-(data.frame) with columns: location (chr),
-date.time (dttm object), temperature, humidity, precipitation, radiation,
-wind_speed
+(data.frame) table with numerical columns except for location (\code{chr})
+and date (\code{Date} for daily output or \code{POSIXct} for hourly output).
+Columns: \code{location}, \code{date}, \code{Tmin} (min daily temperature),
+\code{T} (hourly or averaged daily temperature),
+\code{Tmax} (max daily temperature), \code{humidity}, \code{precipitation}, \code{radiation},
+\code{wind_speed}, \code{n.hours} (scope of the data as number of hours, e.g. used to calculate averages).
 }
 \description{
-Reads ISIP hourly weather export data file (one row per hour) and returns
-a data frame with following columns: \code{date.time}, \code{location},
-\code{temperature}, \code{humidity}, \code{precipitation}, \code{radiation}, \code{wind_speed}.
+Reads an ISIP hourly weather export data file
+(one row per hour) and returns
+a data frame with either hourly or daily data.
+The daily data is derived from the hourly data by averaging per day.
 All sheets from the Excel file are processed and gathered in the same table.
 Each Excel sheet contains the data for a particular geographical location
 and the sheet name provides the location id after trimming a suffix
 starting from the last underscore character.
 }
 \examples{
-path <- system.file("extdata",
-  "20221215_isip_hourly_weather_data_export.xlsx", package = "zeppr")
+# Let us use an example dataset
+file.name <- "20221215_isip_hourly_weather_data_export.xlsx"
+path <- system.file("extdata", file.name, package = "zeppr")
+# Get hourly data
 read_isip_hourly_weather_data(path)
+# Get daily data
+read_isip_hourly_weather_data(path, returns.daily.data=TRUE)
 }
