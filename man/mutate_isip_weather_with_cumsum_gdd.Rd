@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_isip_weather_data.R
 \name{mutate_isip_weather_with_cumsum_gdd}
 \alias{mutate_isip_weather_with_cumsum_gdd}
-\title{mutates ISIP hourly weather data table to add the cumulative sum of growing degree-days}
+\title{Mutates ISIP Weather Table to Add the Cumulative Sum of Growing Degree-Days}
 \usage{
 mutate_isip_weather_with_cumsum_gdd(
   isip.df,
@@ -15,22 +15,29 @@ mutate_isip_weather_with_cumsum_gdd(
 )
 }
 \arguments{
-\item{isip.df}{(data.frame) table of weather data created with function \code{\link[=read_isip_hourly_weather_data]{read_isip_hourly_weather_data()}}}
+\item{isip.df}{(data.frame) table of weather data created with
+function \code{\link[=read_isip_hourly_weather_data]{read_isip_hourly_weather_data()}}}
 
 \item{t.ceiling}{(dbl) ceiling temperature value}
 
-\item{t.base}{(dbl) base temperature}
+\item{t.base}{(dbl) base temperature (base growth temperature)}
 
-\item{use.floor}{(boolean) if \code{TRUE}, \code{t.base} is a floor temperature value}
+\item{use.floor}{(boolean) \code{t.base} is also a floor temperature value
+if \code{TRUE}, nothing more otherwise}
 
 \item{values_to}{(chr) name of the new column to be added}
 
-\item{daily.data}{(boolean) process data as daily data if \code{TRUE}, as hourly data otherwise}
+\item{daily.data}{(boolean) process data as daily data if \code{TRUE}, as hourly
+data otherwise. Processing hourly data as daily data will likely result in
+only NA values in the new column. The other way around will return values
+but they will not be correct.}
 
-\item{max_per_day}{(boolean) outputs the maximum per day if \code{TRUE}, reports for each hour otherwise}
+\item{max_per_day}{(boolean) outputs the maximum per day if \code{TRUE},
+reports for each hour otherwise}
 }
 \value{
-(data.frame) mutated table with an additional column for the cumulative sum of the growing degree-days
+(data.frame) mutated table with an additional column for the
+cumulative sum of the growing degree-days
 }
 \description{
 The ISIP data should be loaded by function \code{\link[=read_isip_hourly_weather_data]{read_isip_hourly_weather_data()}}.
@@ -49,16 +56,23 @@ Growing degree-day formula: ((max + min temperature)/2) - base temperature
 file <- "20221215_isip_hourly_weather_data_export.xlsx"
 path <- system.file("extdata", file, package = "zeppr")
 # ---------------------------------------------------------------------------
-# Computes by hours:
+# Reads hourly data and derive results by hours with or without day summary:
 # ---------------------------------------------------------------------------
+# reads file and keep 10 rows (10 hours) only
 hourly.table <- read_isip_hourly_weather_data(path)[1:10,]
+# adds cumulative growing degree-days per row divided by 24
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
+# keep maximum value per day
 mutate_isip_weather_with_cumsum_gdd(hourly.table, max_per_day=TRUE)
 # ---------------------------------------------------------------------------
-# Computes by days:
+# Reads as daily data and derive results by days with or without floor value:
 # ---------------------------------------------------------------------------
+# reads file and keep 10 rows (10 days) only
 daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:10,]
+# adds cumulative growing degree-days per row
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
+# use floor value for min and max temperatures
+mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE)
 # ---------------------------------------------------------------------------
 # Apply 2 times the function with magrittr pipes and tuned parameters:
 # ---------------------------------------------------------------------------

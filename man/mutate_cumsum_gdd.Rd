@@ -13,32 +13,39 @@ mutate_cumsum_gdd(
   t.base = 5,
   use.floor = FALSE,
   hourly.data = FALSE,
-  values_to = "cumsum_dd"
+  values_to = "cumsum_gdd"
 )
 }
 \arguments{
-\item{df}{(data.frame) table with columns for date (or date including time for hourly data), min and max temperatures}
+\item{df}{(data.frame) table with columns for date (or date including time
+for hourly data), min and max temperatures}
 
-\item{date}{non-quoted column name containing dates (\code{date} column type)}
+\item{date}{non-quoted column name containing dates (\code{Date} class) or
+dates and times (\code{POSIXct} class)}
 
-\item{t.min}{non-quoted column name containing minimum day temperatures (numeric column)}
+\item{t.min}{non-quoted column name containing minimum day temperatures if
+processing daily data, or containing the hourly temperature if
+hourly data (numeric column)}
 
-\item{t.max}{non-quoted column name containing maximum day temperatures (numeric column)}
+\item{t.max}{non-quoted column name containing maximum day temperatures if
+processing daily data, or containing the hourly temperature if
+hourly data  (numeric column)}
 
 \item{t.ceiling}{(dbl) ceiling temperature value for \code{t.max} and \code{t.min}}
 
 \item{t.base}{(dbl) base temperature}
 
-\item{use.floor}{(boolean) if \code{TRUE}, \code{t.base} is a floor value for \code{t.max} and \code{t.min}}
+\item{use.floor}{(boolean) \code{t.base} is also a floor value for \code{t.max} and
+\code{t.min} if \code{TRUE}, nothing more otherwise}
 
-\item{hourly.data}{(boolean) if \code{TRUE} considers dates as hourly data (divides the output by 24),
-as daily data otherwise}
+\item{hourly.data}{(boolean) considers dates as hourly data and divides the
+output by 24 if \code{TRUE}, considers as daily data otherwise.}
 
 \item{values_to}{(chr) name of the new column to store the output}
 }
 \value{
-(data.frame) table copying \code{df} but adding a numerical column for the cumulative
-sum of growing degree-days
+(data.frame) table copying \code{df} but adding a numerical column for
+the cumulative sum of growing degree-days
 }
 \description{
 The input data frame must include columns for date, min and max

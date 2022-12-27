@@ -52,18 +52,25 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 #' each row as defined in [growing_degree_days()].
 #' Finally it calculates the cumulative sum in a new column.
 #'
-#' @param df (data.frame) table with columns for date (or date including time for hourly data), min and max temperatures
-#' @param date non-quoted column name containing dates (`date` column type)
-#' @param t.min non-quoted column name containing minimum day temperatures (numeric column)
-#' @param t.max non-quoted column name containing maximum day temperatures (numeric column)
+#' @param df (data.frame) table with columns for date (or date including time
+#' for hourly data), min and max temperatures
+#' @param date non-quoted column name containing dates (`Date` class) or
+#' dates and times (`POSIXct` class)
+#' @param t.min non-quoted column name containing minimum day temperatures if
+#' processing daily data, or containing the hourly temperature if
+#' hourly data (numeric column)
+#' @param t.max non-quoted column name containing maximum day temperatures if
+#' processing daily data, or containing the hourly temperature if
+#' hourly data  (numeric column)
 #' @param t.ceiling (dbl) ceiling temperature value for `t.max` and `t.min`
 #' @param t.base (dbl) base temperature
-#' @param use.floor (boolean) if `TRUE`, `t.base` is a floor value for `t.max` and `t.min`
-#' @param hourly.data (boolean) if `TRUE` considers dates as hourly data (divides the output by 24),
-#' as daily data otherwise
+#' @param use.floor (boolean) `t.base` is also a floor value for `t.max` and
+#' `t.min` if `TRUE`, nothing more otherwise
+#' @param hourly.data (boolean) considers dates as hourly data and divides the
+#' output by 24 if `TRUE`, considers as daily data otherwise.
 #' @param values_to (chr) name of the new column to store the output
-#' @return (data.frame) table copying `df` but adding a numerical column for the cumulative
-#' sum of growing degree-days
+#' @return (data.frame) table copying `df` but adding a numerical column for
+#' the cumulative sum of growing degree-days
 #' @examples
 #' # given a simple data.frame with date, min and max temperature
 #' data <- data.frame(
@@ -80,11 +87,12 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 #' @importFrom rlang .data
 #' @export
 # ==============================================================================
-mutate_cumsum_gdd <- function(df, date, t.min, t.max, t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE, values_to="cumsum_dd"){
+mutate_cumsum_gdd <- function(df, date, t.min, t.max, t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE, values_to="cumsum_gdd"){
   df <- df %>%
     dplyr::mutate(gdd.19815454532=growing_degree_days({{t.min}}, {{t.max}}, t.ceiling, t.base, use.floor)) %>%
-    dplyr::mutate({{values_to}}:=slider::slide_index_sum(x=.data$gdd.19815454532, i={{date}}, before=Inf, complete=T)) %>%
-    dplyr::select(-.data$gdd.19815454532)
+    dplyr::mutate({{values_to}}:=slider::slide_index_sum(x=.data$gdd.19815454532, i={{date}}, before=Inf, complete=TRUE)) %>%
+    # dplyr::select(-.data$gdd.19815454532)
+    dplyr::select(-"gdd.19815454532")
   if(hourly.data){
     df <- df %>%
       dplyr::mutate({{values_to}}:=.data[[values_to]]/24)

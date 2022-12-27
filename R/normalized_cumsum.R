@@ -12,13 +12,13 @@
 #' @param na.replace (dbl) numeric value used to replace `NA` values (default=`NA` to not replace)
 #' @return (numeric) vector of the cumulative sum normalized by default from 0 to 1
 #' @examples
-#' # Simple case
+#' # Simple case:
 #' normalized_cumsum(c(1,2,3,4,5))
-#' # not-normalized cumulative sum
+#' # not-normalized cumulative sum:
 #' normalized_cumsum(c(1,2,3,4, 5), normalize=FALSE)
-#' # NAs are not processed by default
+#' # NAs are not processed by default:
 #' normalized_cumsum(c(1,2,3,4, NA, 5))
-#' # replace NAs by 0 before summing
+#' # replace NAs by 0 before summing:
 #' normalized_cumsum(c(1,2,3,4, NA, 5), na.replace=0)
 #' @export
 # ==============================================================================

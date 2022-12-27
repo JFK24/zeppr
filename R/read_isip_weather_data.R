@@ -1,10 +1,9 @@
 # ==============================================================================
-#' Reads ISIP hourly weather data file
+#' Reads ISIP Hourly Weather Data File
 #'
-#' Reads an ISIP hourly weather export data file
-#' (one row per hour) and returns
-#' a data frame with either hourly or daily data.
-#' The daily data is derived from the hourly data by averaging per day.
+#' Reads an ISIP hourly weather export data file (Excel file; one row per hour)
+#' and returns a data frame with either hourly or daily data.
+#' The daily data is derived from the hourly data by averaging values per day.
 #' All sheets from the Excel file are processed and gathered in the same table.
 #' Each Excel sheet contains the data for a particular geographical location
 #' and the sheet name provides the location id after trimming a suffix
@@ -12,22 +11,27 @@
 #'
 #' @param excel.path (chr) path to ISIP hourly weather export data file (Excel
 #' file). ISIP's Excel Data format as of Dec 2022.
-#' @param returns.daily.data (boolean) returns daily data if `TRUE`, hourly data otherwise
-#' @param drop.irrelvant.cols (boolean) remove irrelevant columns if `TRUE`, keep all columns otherwise
+#' @param returns.daily.data (boolean) returns daily data if `TRUE`,
+#' hourly data otherwise
+#' @param drop.irrelvant.cols (boolean) remove irrelevant columns if `TRUE`,
+#' keep all columns otherwise
 #' @return (data.frame) table with numerical columns except for location (`chr`)
-#' and date (`Date` for daily output or `POSIXct` for hourly output).
-#' Columns: `location`, `date`, `Tmin` (min daily temperature),
-#' `T` (hourly or averaged daily temperature),
+#' and date (`Date` class for daily output or `POSIXct` class for hourly
+#' output). Columns: `location`, `date`, `Tmin` (min daily temperature),
+#' `temperature` (hourly or averaged daily temperature),
 #' `Tmax` (max daily temperature), `humidity`, `precipitation`, `radiation`,
-#' `wind_speed`, `n.hours` (scope of the data as number of hours, e.g. used to calculate averages).
+#' `wind_speed`, `n.hours` (scope of the data as number of hours, e.g. used to
+#' calculate averages).
 #' @examples
-#' # Let us use an example dataset
+#' # Let us use an example dataset:
 #' file.name <- "20221215_isip_hourly_weather_data_export.xlsx"
 #' path <- system.file("extdata", file.name, package = "zeppr")
-#' # Get hourly data
-#' read_isip_hourly_weather_data(path)
-#' # Get daily data
-#' read_isip_hourly_weather_data(path, returns.daily.data=TRUE)
+#' # Get hourly data:
+#' hourly.table <- read_isip_hourly_weather_data(path)
+#' head(hourly.table)
+#' # Get daily data:
+#' daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)
+#' head(daily.table)
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
@@ -38,10 +42,9 @@ read_isip_hourly_weather_data <- function(
     drop.irrelvant.cols=TRUE
     ){
 
-  col.names=c("ID", "date", "T", "humidity", "precipitation", "radiation", "irrelevant.radiation.2", "wind_speed")
+  col.names=c("ID", "date", "temperature", "humidity", "precipitation", "radiation", "irrelevant.radiation.2", "wind_speed")
   sheet.names <- sort(readxl::excel_sheets(excel.path))
   my.table <- tibble::tibble()
-  # my.table <- data.frame()
   for(sheet.name in sheet.names){
     my.location <- stringr::str_remove(sheet.name, "_.\\d+$")
     d <- readxl::read_excel(excel.path,
@@ -49,12 +52,14 @@ read_isip_hourly_weather_data <- function(
                             col_names=col.names,
                             skip=1,
                             .name_repair = "minimal") %>%
-      dplyr::select(-.data$ID) %>%
+      # dplyr::select(-.data$ID) %>%
+      dplyr::select(-"ID") %>%
       dplyr::mutate(location=my.location) %>%
       dplyr::mutate(Tmin=as.numeric(NA)) %>%
       dplyr::mutate(Tmax=as.numeric(NA)) %>%
-      dplyr::mutate(n.hours=1) %>%
-      dplyr::select(.data$location, .data$date, .data$Tmin, .data$T, .data$Tmax, tidyselect::everything())
+      dplyr::mutate(n.hours=as.integer(1)) %>%
+      # dplyr::select(.data$location, .data$date, .data$Tmin, .data$temperature, .data$Tmax, tidyselect::everything())
+      dplyr::select("location", "date", "Tmin", "temperature", "Tmax", tidyselect::everything())
     if(drop.irrelvant.cols){
       d <- d %>% dplyr::select(-dplyr::starts_with("irrelevant"))
     }
@@ -63,12 +68,13 @@ read_isip_hourly_weather_data <- function(
   if(returns.daily.data){
     my.table <- my.table %>%
       dplyr::mutate(date=as.Date(.data$date)) %>%
-      dplyr::select(.data$date, .data$location, tidyselect::everything()) %>%
+      # dplyr::select(.data$date, .data$location, tidyselect::everything()) %>%
+      dplyr::select("date", "location", tidyselect::everything()) %>%
       dplyr::group_by(.data$location, .data$date) %>%
       dplyr::summarise(
-        Tmin=min(.data$T),
-        T=mean(.data$T),
-        Tmax=max(.data$T),
+        Tmin=min(.data$temperature),
+        temperature=mean(.data$temperature),
+        Tmax=max(.data$temperature),
         humidity=mean(.data$humidity),
         precipitation=mean(.data$precipitation),
         radiation=mean(.data$radiation),
@@ -82,7 +88,7 @@ read_isip_hourly_weather_data <- function(
 
 
 # ==============================================================================
-#' mutates ISIP hourly weather data table to add the cumulative sum of growing degree-days
+#' Mutates ISIP Weather Table to Add the Cumulative Sum of Growing Degree-Days
 #'
 #' The ISIP data should be loaded by function [read_isip_hourly_weather_data()].
 #' For each location and each year in the data, hourly time points (rows of the
@@ -93,14 +99,21 @@ read_isip_hourly_weather_data <- function(
 #' each time point (each hour) will be stored in a new column.
 #' Growing degree-day formula: ((max + min temperature)/2) - base temperature
 #'
-#' @param isip.df (data.frame) table of weather data created with function [read_isip_hourly_weather_data()]
+#' @param isip.df (data.frame) table of weather data created with
+#' function [read_isip_hourly_weather_data()]
 #' @param t.ceiling (dbl) ceiling temperature value
-#' @param t.base (dbl) base temperature
-#' @param use.floor (boolean) if `TRUE`, `t.base` is a floor temperature value
+#' @param t.base (dbl) base temperature (base growth temperature)
+#' @param use.floor (boolean) `t.base` is also a floor temperature value
+#' if `TRUE`, nothing more otherwise
 #' @param values_to (chr) name of the new column to be added
-#' @param daily.data (boolean) process data as daily data if `TRUE`, as hourly data otherwise
-#' @param max_per_day (boolean) outputs the maximum per day if `TRUE`, reports for each hour otherwise
-#' @return (data.frame) mutated table with an additional column for the cumulative sum of the growing degree-days
+#' @param daily.data (boolean) process data as daily data if `TRUE`, as hourly
+#' data otherwise. Processing hourly data as daily data will likely result in
+#' only NA values in the new column. The other way around will return values
+#' but they will not be correct.
+#' @param max_per_day (boolean) outputs the maximum per day if `TRUE`,
+#' reports for each hour otherwise
+#' @return (data.frame) mutated table with an additional column for the
+#' cumulative sum of the growing degree-days
 #' @examples
 #' # ---------------------------------------------------------------------------
 #' # Choose an example file with hourly weather data:
@@ -108,16 +121,23 @@ read_isip_hourly_weather_data <- function(
 #' file <- "20221215_isip_hourly_weather_data_export.xlsx"
 #' path <- system.file("extdata", file, package = "zeppr")
 #' # ---------------------------------------------------------------------------
-#' # Computes by hours:
+#' # Reads hourly data and derive results by hours with or without day summary:
 #' # ---------------------------------------------------------------------------
+#' # reads file and keep 10 rows (10 hours) only
 #' hourly.table <- read_isip_hourly_weather_data(path)[1:10,]
+#' # adds cumulative growing degree-days per row divided by 24
 #' mutate_isip_weather_with_cumsum_gdd(hourly.table)
+#' # keep maximum value per day
 #' mutate_isip_weather_with_cumsum_gdd(hourly.table, max_per_day=TRUE)
 #' # ---------------------------------------------------------------------------
-#' # Computes by days:
+#' # Reads as daily data and derive results by days with or without floor value:
 #' # ---------------------------------------------------------------------------
+#' # reads file and keep 10 rows (10 days) only
 #' daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:10,]
+#' # adds cumulative growing degree-days per row
 #' mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
+#' # use floor value for min and max temperatures
+#' mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE)
 #' # ---------------------------------------------------------------------------
 #' # Apply 2 times the function with magrittr pipes and tuned parameters:
 #' # ---------------------------------------------------------------------------
@@ -135,13 +155,21 @@ read_isip_hourly_weather_data <- function(
 #' @importFrom rlang .data
 #' @export
 # ==============================================================================
-mutate_isip_weather_with_cumsum_gdd <- function(isip.df, t.ceiling=30, t.base=5, use.floor=FALSE, values_to="cumsum_gdd", daily.data=FALSE, max_per_day=FALSE){
+mutate_isip_weather_with_cumsum_gdd <- function(
+    isip.df,
+    t.ceiling=30,
+    t.base=5,
+    use.floor=FALSE,
+    values_to="cumsum_gdd",
+    daily.data=FALSE,
+    max_per_day=FALSE){
+
   my.tmin <- isip.df$Tmin
   my.tmax <- isip.df$Tmax
   my.divider <- 1
   if(!daily.data) {
-    my.tmin <- isip.df$T
-    my.tmax <- isip.df$T
+    my.tmin <- isip.df$temperature
+    my.tmax <- isip.df$temperature
     my.divider <- 24
   }
   isip.df <- isip.df %>%
@@ -157,7 +185,8 @@ mutate_isip_weather_with_cumsum_gdd <- function(isip.df, t.ceiling=30, t.base=5,
       dplyr::mutate,
       {{values_to}}:=slider::slide_index_sum(x=.data$gdd.198445789832, i=.data$date, before=Inf, complete=TRUE)/my.divider
     ) %>%
-    dplyr::select(-.data$gdd.198445789832, -.data$year.198445789832)
+    # dplyr::select(-.data$gdd.198445789832, -.data$year.198445789832)
+    dplyr::select(-"gdd.198445789832", -"year.198445789832")
 
   if(max_per_day){
     isip.df <- isip.df %>%
@@ -167,7 +196,8 @@ mutate_isip_weather_with_cumsum_gdd <- function(isip.df, t.ceiling=30, t.base=5,
         dplyr::mutate,
         {{values_to}}:=max(.data[[values_to]])
       ) %>%
-      dplyr::select(-.data$day.198445789832)
+      # dplyr::select(-.data$day.198445789832)
+      dplyr::select(-"day.198445789832")
   }
   return(isip.df)
 }

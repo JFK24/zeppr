@@ -24,12 +24,12 @@ Then, it divides the new values by the sum of all values.
 The resulting values will range from 0 to 1 as percentages.
 }
 \examples{
-# Simple case
+# Simple case:
 normalized_cumsum(c(1,2,3,4,5))
-# not-normalized cumulative sum
+# not-normalized cumulative sum:
 normalized_cumsum(c(1,2,3,4, 5), normalize=FALSE)
-# NAs are not processed by default
+# NAs are not processed by default:
 normalized_cumsum(c(1,2,3,4, NA, 5))
-# replace NAs by 0 before summing
+# replace NAs by 0 before summing:
 normalized_cumsum(c(1,2,3,4, NA, 5), na.replace=0)
 }
