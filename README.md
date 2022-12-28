@@ -39,8 +39,11 @@ normalized_cumsum(c(1,2,3,4,5))
 
 ### Growing degree-days for vectors
 
-Calculates the Growing degree-days for pairs of min and max
-temperatures. It can be hourly or daily data.
+Calculates the growing degree-days for pairs of min and max day
+temperatures. It is developed for daily data but can be used for hourly
+data with a few tricks.
+
+#### For daily data
 
 ``` r
 # A simple example: the growing degree-days gdd = ((9+20)/2)-10 = 4.5
@@ -55,6 +58,31 @@ growing_degree_days(t.min=9, t.max=20, t.ceiling=15, t.base=10, use.floor=TRUE)
 # Processes pairs of min max temperatures defined in 2 vectors of same length
 growing_degree_days(c(7, 8, 10), c(12, 14, 15), t.ceiling=30, t.base=10, use.floor=FALSE)
 #> [1] 0.0 1.0 2.5
+```
+
+#### Tricks for hourly data
+
+- Hourly data tables have 1 row per hour and thus 24 rows per day.
+- Each hour has only 1 temperature (no min and max day temperatures)
+- Let us define growing degree-hours as the same than growing
+  degree-days but applied for a single hour where the min and max
+  temperatures are both equal to the temperature for this hour
+- The degree-days for 1 day is equal to the sum of its 24 degree-hours
+  divided by 24.
+
+The following tricks are automatized by the `mutate_cumsum_gdd` function
+described below.
+
+``` r
+# Let say we have 24 temperatures for a particular day
+temperatures = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+# We can get corresponding degree-hours above 5 degrees
+gdh <- growing_degree_days(t.min=temperatures, t.max=temperatures, t.base=5)
+print(gdh)
+#>  [1] 0 0 0 0 0 1 2 3 4 5 6 7 6 5 4 3 2 1 0 0 0 0 0 0
+# the growing degree-days for this day is calculated as follows:
+sum(gdh)/24
+#> [1] 2.041667
 ```
 
 ### Growing degree-days for data frames
@@ -107,8 +135,10 @@ print(hourly.table)
 #> 1 2022-01-01 13:00:00          12
 #> 2 2022-01-02 14:00:00          14
 #> 3 2022-01-03 15:00:00          20
-# we add a column containing growing degree-days as follows:
-mutate_cumsum_gdd(hourly.table, date=date.time, t.min=temperature, t.max=temperature, 
+# we add a column containing growing degree-days by setting hourly.data to TRUE 
+# and reusing hourly temperatures with t.min and t.mx parameters as follows:
+mutate_cumsum_gdd(hourly.table, date=date.time, 
+                  t.min=temperature, t.max=temperature, 
                   t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=TRUE)
 #>             date.time temperature cumsum_gdd
 #> 1 2022-01-01 13:00:00          12  0.2916667
