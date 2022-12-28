@@ -176,12 +176,14 @@ mutate_isip_weather_with_cumsum_gdd <- function(
     dplyr::arrange(.data$location, .data$date) %>%
     dplyr::mutate(year.198445789832=lubridate::year(.data$date)) %>%
     dplyr::with_groups(
-      .groups = c(.data$location, .data$year.198445789832),
+      # .groups = c(.data$location, .data$year.198445789832),
+      .groups = c("location", "year.198445789832"),
       dplyr::mutate,
       gdd.198445789832=growing_degree_days(my.tmin, my.tmax, t.ceiling, t.base, use.floor)
     ) %>%
     dplyr::with_groups(
-      .groups = c(.data$location, .data$year.198445789832),
+      # .groups = c(.data$location, .data$year.198445789832),
+      .groups = c("location", "year.198445789832"),
       dplyr::mutate,
       {{values_to}}:=slider::slide_index_sum(x=.data$gdd.198445789832, i=.data$date, before=Inf, complete=TRUE)/my.divider
     ) %>%
@@ -192,7 +194,8 @@ mutate_isip_weather_with_cumsum_gdd <- function(
     isip.df <- isip.df %>%
       dplyr::mutate(day.198445789832=as.Date(.data$date)) %>%
       dplyr::with_groups(
-        .groups = c(.data$location, .data$day.198445789832),
+        # .groups = c(.data$location, .data$day.198445789832),
+        .groups = c("location", "day.198445789832"),
         dplyr::mutate,
         {{values_to}}:=max(.data[[values_to]])
       ) %>%
