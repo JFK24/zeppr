@@ -182,8 +182,8 @@ head(daily.table)
 Processing hourly data:
 
 ```{r}
-# reads file and keep only 10 rows (10 hours)
-hourly.table <- read_isip_hourly_weather_data(path)[1:10,]
+# reads file and keep only 10 rows (10 hours) and 5 first columns
+hourly.table <- read_isip_hourly_weather_data(path)[1:10,1:5]
 # adds cumulative growing degree-days per row divided by 24
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
 # adds max cumulative growing degree-days per day
@@ -193,9 +193,9 @@ mutate_isip_weather_with_cumsum_gdd(hourly.table, max_per_day=TRUE)
 Processing daily data:
 
 ```{r}
-# reads file and keep 10 rows (10 days) only
+# reads file and keep only 10 rows (10 days) and 5 first columns
 daily.table <- read_isip_hourly_weather_data(path, 
-                                             returns.daily.data=TRUE)[1:10,]
+                                             returns.daily.data=TRUE)[1:10,1:5]
 # adds cumulative growing degree-days per row
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 # adds cumulative growing degree-days per row with floor value for 
