@@ -4,14 +4,14 @@
 \alias{normalized_cumsum}
 \title{Normalized Cumulative Sum}
 \usage{
-normalized_cumsum(values, normalize = TRUE, na.replace = NA)
+normalized_cumsum(values, normalize = TRUE, na_replace = NA)
 }
 \arguments{
 \item{values}{(numeric) vector of numerical values}
 
 \item{normalize}{(boolean) returns normalized cumulative sum if \code{TRUE}, simple cumulative sum otherwise}
 
-\item{na.replace}{(dbl) numeric value used to replace \code{NA} values (default=\code{NA} to not replace)}
+\item{na_replace}{(dbl) numeric value used to replace \code{NA} values (default=\code{NA} to not replace)}
 }
 \value{
 (numeric) vector of the cumulative sum normalized by default from 0 to 1
@@ -31,5 +31,5 @@ normalized_cumsum(c(1,2,3,4, 5), normalize=FALSE)
 # NAs are not processed by default:
 normalized_cumsum(c(1,2,3,4, NA, 5))
 # replace NAs by 0 before summing:
-normalized_cumsum(c(1,2,3,4, NA, 5), na.replace=0)
+normalized_cumsum(c(1,2,3,4, NA, 5), na_replace=0)
 }

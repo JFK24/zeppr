@@ -21,6 +21,25 @@ required. You can install the development version of `zeppr` from
 ``` r
 # install.packages("devtools") # uncomment to install devtools if necessary 
 devtools::install_github("JFK24/zeppr")
+#> Downloading GitHub repo JFK24/zeppr@HEAD
+#> Warning in untar2(tarfile, files, list, exdir, restore_times): skipping pax
+#> global extended headers
+
+#> Warning in untar2(tarfile, files, list, exdir, restore_times): skipping pax
+#> global extended headers
+#> 
+#> ── R CMD build ─────────────────────────────────────────────────────────────────
+#>          checking for file 'C:\Users\fonta\AppData\Local\Temp\Rtmp8kBJEW\remotes271c54a54da9\JFK24-zeppr-3c042e9/DESCRIPTION' ...  ✔  checking for file 'C:\Users\fonta\AppData\Local\Temp\Rtmp8kBJEW\remotes271c54a54da9\JFK24-zeppr-3c042e9/DESCRIPTION'
+#>       ─  preparing 'zeppr':
+#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
+#>       ─  checking for LF line-endings in source and make files and shell scripts
+#>   ─  checking for empty or unneeded directories
+#>      Omitted 'LazyData' from DESCRIPTION
+#>       ─  building 'zeppr_0.1.0.tar.gz'
+#>      
+#> 
+#> Installiere Paket nach 'C:/Users/fonta/AppData/Local/Temp/Rtmp216lXc/temp_libpath82c68a03bfa'
+#> (da 'lib' nicht spezifiziert)
 ```
 
 ## Examples
@@ -251,8 +270,7 @@ Processing daily data:
 
 ``` r
 # reads file and keep only 10 rows (10 days) and 5 first columns
-daily.table <- read_isip_hourly_weather_data(path, 
-                                             returns.daily.data=TRUE)[1:10,1:5]
+daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:10,1:5]
 # adds cumulative growing degree-days per row
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 #> # A tibble: 10 × 6
@@ -268,7 +286,7 @@ mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 #>  8 BWWR100  2022-01-08  1.73        3.00   3.00        9.54
 #>  9 BWWR100  2022-01-09  0.686       3.82   3.82        9.54
 #> 10 BWWR100  2022-01-10 -0.808       1.75   1.75        9.54
-# adds cumulative growing degree-days per row with floor value for 
+# adds cumulative growing degree-days per row with floor value for
 # min and max temperatures
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE)
 #> # A tibble: 10 × 6
