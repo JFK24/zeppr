@@ -31,9 +31,9 @@ test_that("test of mutate_isip_weather_with_cumsum_gdd()",{
   # Test daily data:
   daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:3,]
   expect_equal(
-    c(2.12, 2.76, 8.04),
+    c(4.48, 7.64, 13.89),
     round(mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)$cumsum_gdd, 2))
   expect_equal(
-    c(2.19, 3.61, 8.89),
+    c(4.55, 8.48, 14.73),
     round(mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE)$cumsum_gdd, 2))
 })

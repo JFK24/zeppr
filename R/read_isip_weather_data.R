@@ -68,12 +68,11 @@ read_isip_hourly_weather_data <- function(
   if(returns.daily.data){
     my.table <- my.table %>%
       dplyr::mutate(date=as.Date(.data$date)) %>%
-      # dplyr::select(.data$date, .data$location, tidyselect::everything()) %>%
       dplyr::select("date", "location", tidyselect::everything()) %>%
       dplyr::group_by(.data$location, .data$date) %>%
       dplyr::summarise(
         Tmin=min(.data$temperature),
-        temperature=mean(.data$temperature),
+        "Tavg"=mean(.data$temperature),
         Tmax=max(.data$temperature),
         humidity=mean(.data$humidity),
         precipitation=mean(.data$precipitation),
@@ -81,7 +80,8 @@ read_isip_hourly_weather_data <- function(
         wind_speed=mean(.data$wind_speed),
         n.hours=dplyr::n(),
         .groups="drop"
-      )
+      ) %>%
+      dplyr::rename(temperature="Tavg")
   }
   return(my.table %>% dplyr::arrange(.data$location, .data$date))
 }

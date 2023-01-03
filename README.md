@@ -132,7 +132,7 @@ hourly.table <- data.frame(
   date.time=as.POSIXct(c("2022-01-01 13:00:00", "2022-01-02 14:00:00", "2022-01-03 15:00:00")),
   temperature=c(12, 14, 20)
 )
-# we add a column containing cumulative sum of growing degree-days as follows: 
+# we add a column containing cumulative sum of growing degree-days 
 # by setting hourly.data to TRUE and reusing hourly temperatures 
 # for both t.min and t.max parameters as follows:
 mutate_cumsum_gdd(hourly.table, date=date.time, 
@@ -142,7 +142,7 @@ mutate_cumsum_gdd(hourly.table, date=date.time,
 #> 1 2022-01-01 13:00:00          12  0.2916667
 #> 2 2022-01-02 14:00:00          14  0.6666667
 #> 3 2022-01-03 15:00:00          20  1.2916667
-# With %>% pipes from magrittr and custom column name:
+# Same with %>% pipes from magrittr and custom column name:
 library(magrittr)
 hourly.table %>% mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd")
 #>             date.time temperature    my_gdd
@@ -151,7 +151,7 @@ hourly.table %>% mutate_cumsum_gdd(date.time, temperature, temperature, hourly.d
 #> 3 2022-01-03 15:00:00          20 1.2916667
 ```
 
-### Reads ISIP hourly weather data
+### Read ISIP hourly weather data
 
 An example ISIP hourly weather data file is provided with this package
 at the following path:
@@ -161,7 +161,7 @@ file.name <- "20221215_isip_hourly_weather_data_export.xlsx"
 path <- system.file("extdata", file.name, package = "zeppr")
 ```
 
-#### Reads the ISIP hourly data file
+#### Read the ISIP hourly data file
 
 ``` r
 # Get hourly data:
@@ -180,7 +180,7 @@ head(hourly.table)
 #> #   variable names ¹​precipitation, ²​radiation
 ```
 
-#### Reads the ISIP hourly data file but transform it as daily data
+#### Read the ISIP hourly data file but transform it as daily data
 
 ``` r
 # Get daily data:
@@ -189,12 +189,12 @@ head(daily.table)
 #> # A tibble: 6 × 10
 #>   locat…¹ date        Tmin tempe…²  Tmax humid…³ preci…⁴ radia…⁵ wind_…⁶ n.hours
 #>   <chr>   <date>     <dbl>   <dbl> <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <int>
-#> 1 BWWR100 2022-01-01  4.86    9.37  9.37    91.0  0        51.8    0.774      24
-#> 2 BWWR100 2022-01-02  3.44    7.84  7.84    85.8  0        29.5    1.82       24
-#> 3 BWWR100 2022-01-03  9.39   11.2  11.2     76.1  0.0542   16.4    3.48       24
-#> 4 BWWR100 2022-01-04  4.51    8.51  8.51    94.8  1.52      6.33   2.86       24
-#> 5 BWWR100 2022-01-05  2.29    3.45  3.45    81.8  0        36.4    2.84       24
-#> 6 BWWR100 2022-01-06 -1.09    2.34  2.34    90.6  0        35.3    1.60       24
+#> 1 BWWR100 2022-01-01  4.86    9.37 14.1     91.0  0        51.8    0.774      24
+#> 2 BWWR100 2022-01-02  3.44    7.84 12.9     85.8  0        29.5    1.82       24
+#> 3 BWWR100 2022-01-03  9.39   11.2  13.1     76.1  0.0542   16.4    3.48       24
+#> 4 BWWR100 2022-01-04  4.51    8.51 11.9     94.8  1.52      6.33   2.86       24
+#> 5 BWWR100 2022-01-05  2.29    3.45  5.75    81.8  0        36.4    2.84       24
+#> 6 BWWR100 2022-01-06 -1.09    2.34  4.71    90.6  0        35.3    1.60       24
 #> # … with abbreviated variable names ¹​location, ²​temperature, ³​humidity,
 #> #   ⁴​precipitation, ⁵​radiation, ⁶​wind_speed
 ```
@@ -212,7 +212,7 @@ Processing hourly data:
 ``` r
 # reads file and keeps only 5 first columns and 10 rows (10 hours)
 hourly.table <- read_isip_hourly_weather_data(path)[1:10,1:5]
-# adds cumulative growing degree-days per row divided by 24
+# adds cumulative growing degree-days per hour
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
 #> # A tibble: 10 × 6
 #>    location date                 Tmin temperature  Tmax cumsum_gdd
@@ -227,7 +227,7 @@ mutate_isip_weather_with_cumsum_gdd(hourly.table)
 #>  8 BWWR100  2022-01-01 07:00:00    NA        8.45    NA      1.35 
 #>  9 BWWR100  2022-01-01 08:00:00    NA        8.25    NA      1.49 
 #> 10 BWWR100  2022-01-01 09:00:00    NA        8.60    NA      1.64
-# adds max cumulative growing degree-days per day
+# keeps only the maximum value per day
 mutate_isip_weather_with_cumsum_gdd(hourly.table, max_per_day=TRUE)
 #> # A tibble: 10 × 6
 #>    location date                 Tmin temperature  Tmax cumsum_gdd
@@ -249,35 +249,35 @@ Processing daily data:
 ``` r
 # reads file and keeps only 5 first columns and 10 rows (10 days)
 daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:10,1:5]
-# adds cumulative growing degree-days per row
+# adds cumulative growing degree-days per day
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 #> # A tibble: 10 × 6
-#>    location date         Tmin temperature   Tmax cumsum_gdd
-#>    <chr>    <date>      <dbl>       <dbl>  <dbl>      <dbl>
-#>  1 BWWR100  2022-01-01  4.86        9.37   9.37        2.12
-#>  2 BWWR100  2022-01-02  3.44        7.84   7.84        2.76
-#>  3 BWWR100  2022-01-03  9.39       11.2   11.2         8.04
-#>  4 BWWR100  2022-01-04  4.51        8.51   8.51        9.54
-#>  5 BWWR100  2022-01-05  2.29        3.45   3.45        9.54
-#>  6 BWWR100  2022-01-06 -1.09        2.34   2.34        9.54
-#>  7 BWWR100  2022-01-07 -1.62        0.801  0.801       9.54
-#>  8 BWWR100  2022-01-08  1.73        3.00   3.00        9.54
-#>  9 BWWR100  2022-01-09  0.686       3.82   3.82        9.54
-#> 10 BWWR100  2022-01-10 -0.808       1.75   1.75        9.54
-# adds cumulative growing degree-days per row with floor value for
+#>    location date         Tmin temperature  Tmax cumsum_gdd
+#>    <chr>    <date>      <dbl>       <dbl> <dbl>      <dbl>
+#>  1 BWWR100  2022-01-01  4.86        9.37  14.1        4.48
+#>  2 BWWR100  2022-01-02  3.44        7.84  12.9        7.64
+#>  3 BWWR100  2022-01-03  9.39       11.2   13.1       13.9 
+#>  4 BWWR100  2022-01-04  4.51        8.51  11.9       17.1 
+#>  5 BWWR100  2022-01-05  2.29        3.45   5.75      17.1 
+#>  6 BWWR100  2022-01-06 -1.09        2.34   4.71      17.1 
+#>  7 BWWR100  2022-01-07 -1.62        0.801  3.02      17.1 
+#>  8 BWWR100  2022-01-08  1.73        3.00   4.21      17.1 
+#>  9 BWWR100  2022-01-09  0.686       3.82   5.96      17.1 
+#> 10 BWWR100  2022-01-10 -0.808       1.75   4.93      17.1
+# adds cumulative growing degree-days per day with floor value for
 # min and max temperatures
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE)
 #> # A tibble: 10 × 6
-#>    location date         Tmin temperature   Tmax cumsum_gdd
-#>    <chr>    <date>      <dbl>       <dbl>  <dbl>      <dbl>
-#>  1 BWWR100  2022-01-01  4.86        9.37   9.37        2.19
-#>  2 BWWR100  2022-01-02  3.44        7.84   7.84        3.61
-#>  3 BWWR100  2022-01-03  9.39       11.2   11.2         8.89
-#>  4 BWWR100  2022-01-04  4.51        8.51   8.51       10.6 
-#>  5 BWWR100  2022-01-05  2.29        3.45   3.45       10.6 
-#>  6 BWWR100  2022-01-06 -1.09        2.34   2.34       10.6 
-#>  7 BWWR100  2022-01-07 -1.62        0.801  0.801      10.6 
-#>  8 BWWR100  2022-01-08  1.73        3.00   3.00       10.6 
-#>  9 BWWR100  2022-01-09  0.686       3.82   3.82       10.6 
-#> 10 BWWR100  2022-01-10 -0.808       1.75   1.75       10.6
+#>    location date         Tmin temperature  Tmax cumsum_gdd
+#>    <chr>    <date>      <dbl>       <dbl> <dbl>      <dbl>
+#>  1 BWWR100  2022-01-01  4.86        9.37  14.1        4.55
+#>  2 BWWR100  2022-01-02  3.44        7.84  12.9        8.48
+#>  3 BWWR100  2022-01-03  9.39       11.2   13.1       14.7 
+#>  4 BWWR100  2022-01-04  4.51        8.51  11.9       18.2 
+#>  5 BWWR100  2022-01-05  2.29        3.45   5.75      18.6 
+#>  6 BWWR100  2022-01-06 -1.09        2.34   4.71      18.6 
+#>  7 BWWR100  2022-01-07 -1.62        0.801  3.02      18.6 
+#>  8 BWWR100  2022-01-08  1.73        3.00   4.21      18.6 
+#>  9 BWWR100  2022-01-09  0.686       3.82   5.96      19.0 
+#> 10 BWWR100  2022-01-10 -0.808       1.75   4.93      19.0
 ```
