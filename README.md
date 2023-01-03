@@ -16,30 +16,14 @@ use at your own risks. Contact me for commercial use.
 
 This package was developed using R 4.2.2. The library `devtools` is also
 required. You can install the development version of `zeppr` from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/) by uncommenting the following code:
 
 ``` r
-# install.packages("devtools") # uncomment to install devtools if necessary 
-devtools::install_github("JFK24/zeppr")
-#> Downloading GitHub repo JFK24/zeppr@HEAD
-#> Warning in untar2(tarfile, files, list, exdir, restore_times): skipping pax
-#> global extended headers
+# uncomment to install devtools if necessary:
+# install.packages("devtools")
 
-#> Warning in untar2(tarfile, files, list, exdir, restore_times): skipping pax
-#> global extended headers
-#> 
-#> ── R CMD build ─────────────────────────────────────────────────────────────────
-#>          checking for file 'C:\Users\fonta\AppData\Local\Temp\Rtmp8kBJEW\remotes271c54a54da9\JFK24-zeppr-3c042e9/DESCRIPTION' ...  ✔  checking for file 'C:\Users\fonta\AppData\Local\Temp\Rtmp8kBJEW\remotes271c54a54da9\JFK24-zeppr-3c042e9/DESCRIPTION'
-#>       ─  preparing 'zeppr':
-#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
-#>       ─  checking for LF line-endings in source and make files and shell scripts
-#>   ─  checking for empty or unneeded directories
-#>      Omitted 'LazyData' from DESCRIPTION
-#>       ─  building 'zeppr_0.1.0.tar.gz'
-#>      
-#> 
-#> Installiere Paket nach 'C:/Users/fonta/AppData/Local/Temp/Rtmp216lXc/temp_libpath82c68a03bfa'
-#> (da 'lib' nicht spezifiziert)
+# uncomment to install zeppr:
+# devtools::install_github("JFK24/zeppr")
 ```
 
 ## Examples
@@ -69,13 +53,13 @@ function `mutate_cumsum_gdd()` described further below.
 #### For daily data
 
 ``` r
-# A simple example: the growing degree-days gdd = ((9+20)/2)-10 = 4.5
+# A simple example of growing degree-days gdd = ((9+20)/2)-10 = 4.5
 growing_degree_days(t.min=9, t.max=20, t.ceiling=30, t.base=10, use.floor=FALSE)
 #> [1] 4.5
-# If t.base is used as floor value: gdd = ((10+20)/2)-10 = 5
+# Same example but t.base is used as floor value: gdd = ((10+20)/2)-10 = 5
 growing_degree_days(t.min=9, t.max=20, t.ceiling=30, t.base=10, use.floor=TRUE)
 #> [1] 5
-# If a floor and a ceiling temperature are used:  gdd = ((10+15)/2)-10 = 2.5
+# Now with a lower ceiling value that will change t.max:  gdd = ((10+15)/2)-10 = 2.5
 growing_degree_days(t.min=9, t.max=20, t.ceiling=15, t.base=10, use.floor=TRUE)
 #> [1] 2.5
 # Processes pairs of min max temperatures defined in 2 vectors of same length
@@ -87,9 +71,9 @@ growing_degree_days(c(7, 8, 10), c(12, 14, 15), t.ceiling=30, t.base=10, use.flo
 
 - Hourly data tables have 1 row per hour and thus 24 rows per day
 - Each hour has only 1 temperature (no min and max day temperatures)
-- Let us define growing degree-hours as the same than growing
-  degree-days but applied for a single hour where the min and max
-  temperatures are both equal to the temperature for this hour
+- Let us define growing degree-hours as the same as growing degree-days
+  but applied for a single hour where the min and max temperatures are
+  both equal to the temperature for this hour
 - The degree-days for 1 day is equal to the sum of its 24 degree-hours
   divided by 24.
 
@@ -124,11 +108,6 @@ daily.table <- data.frame(
   Date=as.Date(c("2022-01-01", "2022-01-02", "2022-01-03")),
   Tmin=c(4, 6, 11),
   Tmax=c(12, 14, 20))
-print(daily.table)
-#>         Date Tmin Tmax
-#> 1 2022-01-01    4   12
-#> 2 2022-01-02    6   14
-#> 3 2022-01-03   11   20
 # we add a column containing cumulative sum of growing degree-days as follows:
 mutate_cumsum_gdd(daily.table, date=Date, t.min=Tmin, t.max=Tmax, 
                   t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE)
@@ -153,11 +132,6 @@ hourly.table <- data.frame(
   date.time=as.POSIXct(c("2022-01-01 13:00:00", "2022-01-02 14:00:00", "2022-01-03 15:00:00")),
   temperature=c(12, 14, 20)
 )
-print(hourly.table)
-#>             date.time temperature
-#> 1 2022-01-01 13:00:00          12
-#> 2 2022-01-02 14:00:00          14
-#> 3 2022-01-03 15:00:00          20
 # we add a column containing cumulative sum of growing degree-days as follows: 
 # by setting hourly.data to TRUE and reusing hourly temperatures 
 # for both t.min and t.max parameters as follows:
@@ -179,8 +153,8 @@ hourly.table %>% mutate_cumsum_gdd(date.time, temperature, temperature, hourly.d
 
 ### Reads ISIP hourly weather data
 
-An example ISIP hourly data file is provided with this package at the
-following path:
+An example ISIP hourly weather data file is provided with this package
+at the following path:
 
 ``` r
 file.name <- "20221215_isip_hourly_weather_data_export.xlsx"
@@ -229,10 +203,14 @@ head(daily.table)
 
 #### Add the cumulative sum of growing degree-days to ISIP tables
 
+Function `mutate_isip_weather_with_cumsum_gdd()` adds the cumulative sum
+of growing degree-days to an ISIP data frame. Calculations are done on
+groups of rows defined by geographical location and year.
+
 Processing hourly data:
 
 ``` r
-# reads file and keep only 10 rows (10 hours) and 5 first columns
+# reads file and keeps only 5 first columns and 10 rows (10 hours)
 hourly.table <- read_isip_hourly_weather_data(path)[1:10,1:5]
 # adds cumulative growing degree-days per row divided by 24
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
@@ -269,7 +247,7 @@ mutate_isip_weather_with_cumsum_gdd(hourly.table, max_per_day=TRUE)
 Processing daily data:
 
 ``` r
-# reads file and keep only 10 rows (10 days) and 5 first columns
+# reads file and keeps only 5 first columns and 10 rows (10 days)
 daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:10,1:5]
 # adds cumulative growing degree-days per row
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
