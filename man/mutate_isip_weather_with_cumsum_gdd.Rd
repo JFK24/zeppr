@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_isip_weather_data.R
 \name{mutate_isip_weather_with_cumsum_gdd}
 \alias{mutate_isip_weather_with_cumsum_gdd}
-\title{Mutates ISIP Weather Table to Add the Cumulative Sum of Growing Degree-Days}
+\title{Adds the Cumulative Sum of Growing Degree-Days to an ISIP Weather Data Table}
 \usage{
 mutate_isip_weather_with_cumsum_gdd(
   isip.df,
@@ -41,13 +41,14 @@ cumulative sum of the growing degree-days
 }
 \description{
 The ISIP data should be loaded by function \code{\link[=read_isip_hourly_weather_data]{read_isip_hourly_weather_data()}}.
-For each location and each year in the data, hourly time points (rows of the
+For each location and each year in the data, time points (rows of the
 table) are expected to be complete starting from 1st January to last time
-point of interest (e.g. every hour from 01 January to 30 June).
+point of interest (e.g. every hour or every day from 01 January to 30 June).
 The data will be ordered by location and time, temporarily grouped by
 location and year, and then the cumulative sum of growing degree-days at
-each time point (each hour) will be stored in a new column.
-Growing degree-day formula: ((max + min temperature)/2) - base temperature
+each time point (each day or each hour) will be stored in a new column.
+Make sure that the \code{daily.data} parameter is appropriately set to fit
+your data.
 }
 \examples{
 # ---------------------------------------------------------------------------

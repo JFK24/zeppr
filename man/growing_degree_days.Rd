@@ -19,16 +19,21 @@ growing_degree_days(
 
 \item{t.ceiling}{(dbl) ceiling temperature value for \code{t.max} and \code{t.min}}
 
-\item{t.base}{(dbl) base temperature}
+\item{t.base}{(dbl) base growth temperature}
 
-\item{use.floor}{(boolean) if \code{TRUE}, \code{t.base} is a floor value for \code{t.max} and \code{t.min}}
+\item{use.floor}{(boolean) \code{t.base} is used as a floor value
+for \code{t.max} and \code{t.min} if \code{TRUE}, nothing more otherwise}
 }
 \value{
 (numeric) vector of growing degree-days (same length as \code{t.min})
 }
 \description{
-Calculates the growing degree-days independently for each pair of min and
-max day temperature values.
+Calculates the growing degree-days independently for each pair of min
+and max day temperature values.
+Min and max Temperature values are provided as 2 vectors of same size.
+A pair is defined as 2 values at same position in the vectors.
+Although no time data is required here for the calculation,
+each pair represents implicitly a time point: either 1 day or 1 hour.
 Basic Formula: ((max temperature + min temperature)/2) - base temperature
 }
 \examples{

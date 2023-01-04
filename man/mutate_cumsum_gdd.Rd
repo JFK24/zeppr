@@ -17,31 +17,31 @@ mutate_cumsum_gdd(
 )
 }
 \arguments{
-\item{df}{(data.frame) table with columns for date (or date including time
-for hourly data), min and max temperatures}
+\item{df}{(data.frame) table with columns for date, min and max temperatures
+(or date including time and hourly temperature for hourly data).}
 
 \item{date}{non-quoted column name containing dates (\code{Date} class) or
 dates and times (\code{POSIXct} class)}
 
 \item{t.min}{non-quoted column name containing minimum day temperatures if
-processing daily data, or containing the hourly temperature if
-hourly data (numeric column)}
+processing daily data, or containing the hourly temperature (like \code{t.max})
+if hourly data (numeric column)}
 
 \item{t.max}{non-quoted column name containing maximum day temperatures if
-processing daily data, or containing the hourly temperature if
-hourly data  (numeric column)}
+processing daily data, or containing the hourly temperature (like \code{t.min})
+if hourly data  (numeric column)}
 
 \item{t.ceiling}{(dbl) ceiling temperature value for \code{t.max} and \code{t.min}}
 
-\item{t.base}{(dbl) base temperature}
+\item{t.base}{(dbl) base growth temperature}
 
 \item{use.floor}{(boolean) \code{t.base} is also a floor value for \code{t.max} and
 \code{t.min} if \code{TRUE}, nothing more otherwise}
 
-\item{hourly.data}{(boolean) considers dates as hourly data and divides the
+\item{hourly.data}{(boolean) considers the data as hourly data and divides the
 output by 24 if \code{TRUE}, considers as daily data otherwise.}
 
-\item{values_to}{(chr) name of the new column to store the output}
+\item{values_to}{(chr) name of the new column to store the results}
 }
 \value{
 (data.frame) table copying \code{df} but adding a numerical column for
@@ -54,12 +54,13 @@ Thus, the data.frame should be grouped by relevant variables such as
 years and geographical locations otherwise it is assumed that there is only
 1 location.
 In each group of the data frame or in the full data frame if no groups are
-defined, every time point from 1st January to last date of interest
-must be represented by exactly one row (no missing time
+defined, every time point from 1st January (highly recommended) to last
+date of interest must be represented by exactly one row (no missing time
 point). \code{NA}s are not supported for the min and max temperatures.
 Then, the function calculates the growing degree-days independently for
 each row as defined in \code{\link[=growing_degree_days]{growing_degree_days()}}.
-Finally it calculates the cumulative sum in a new column.
+Finally it calculates the cumulative sum and returns a copy of the data
+frame with a a new column for the results.
 }
 \examples{
 # given a simple data.frame with date, min and max temperature

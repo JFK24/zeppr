@@ -5,8 +5,9 @@
 #' and returns a data frame with either hourly or daily data.
 #' The daily data is derived from the hourly data by averaging values per day.
 #' All sheets from the Excel file are processed and gathered in the same table.
-#' Each Excel sheet contains the data for a particular geographical location
-#' and the sheet name provides the location id after trimming a suffix
+#' Within an ISIP Excel file, each sheet represent a particular geographical
+#' location and contains weather data for the same date and time range.
+#' Sheet names provides the location ids after trimming a suffix
 #' starting from the last underscore character.
 #'
 #' @param excel.path (chr) path to ISIP hourly weather export data file (Excel
@@ -88,16 +89,17 @@ read_isip_hourly_weather_data <- function(
 
 
 # ==============================================================================
-#' Mutates ISIP Weather Table to Add the Cumulative Sum of Growing Degree-Days
+#' Adds the Cumulative Sum of Growing Degree-Days to an ISIP Weather Data Table
 #'
 #' The ISIP data should be loaded by function [read_isip_hourly_weather_data()].
-#' For each location and each year in the data, hourly time points (rows of the
+#' For each location and each year in the data, time points (rows of the
 #' table) are expected to be complete starting from 1st January to last time
-#' point of interest (e.g. every hour from 01 January to 30 June).
+#' point of interest (e.g. every hour or every day from 01 January to 30 June).
 #' The data will be ordered by location and time, temporarily grouped by
 #' location and year, and then the cumulative sum of growing degree-days at
-#' each time point (each hour) will be stored in a new column.
-#' Growing degree-day formula: ((max + min temperature)/2) - base temperature
+#' each time point (each day or each hour) will be stored in a new column.
+#' Make sure that the `daily.data` parameter is appropriately set to fit
+#' your data.
 #'
 #' @param isip.df (data.frame) table of weather data created with
 #' function [read_isip_hourly_weather_data()]

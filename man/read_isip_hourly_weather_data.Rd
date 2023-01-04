@@ -34,8 +34,9 @@ Reads an ISIP hourly weather export data file (Excel file; one row per hour)
 and returns a data frame with either hourly or daily data.
 The daily data is derived from the hourly data by averaging values per day.
 All sheets from the Excel file are processed and gathered in the same table.
-Each Excel sheet contains the data for a particular geographical location
-and the sheet name provides the location id after trimming a suffix
+Within an ISIP Excel file, each sheet represent a particular geographical
+location and contains weather data for the same date and time range.
+Sheet names provides the location ids after trimming a suffix
 starting from the last underscore character.
 }
 \examples{
