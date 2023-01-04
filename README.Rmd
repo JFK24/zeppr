@@ -141,9 +141,13 @@ hourly.table <- data.frame(
 mutate_cumsum_gdd(hourly.table, date=date.time, 
                   t.min=temperature, t.max=temperature, 
                   t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=TRUE)
-# Same with %>% pipes from magrittr and custom column name:
+# Same with %>% pipes from magrittr and custom column names for various parameters:
 library(magrittr)
-hourly.table %>% mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd")
+hourly.table %>% 
+  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd_2", t.base = 2) %>% 
+  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd_3", t.base = 3) %>% 
+  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd_4", t.base = 4)
+  
 ```
 
 
