@@ -105,13 +105,13 @@ read_isip_hourly_weather_data <- function(
 #' @param t.base (dbl) base growth temperature
 #' @param use.floor (boolean) `t.base` is also a floor temperature value
 #' if `TRUE`, nothing more otherwise
-#' @param values.to (chr) name of the new column to be added
 #' @param daily.data (boolean) process data as daily data if `TRUE`, as hourly
 #' data otherwise. Processing hourly data as daily data will likely result in
 #' only NA values in the new column. The other way around will return values
 #' but they will not be correct.
 #' @param max.per.day (boolean) outputs the maximum per day if `TRUE`,
-#' reports for each hour otherwise
+#' reports for each hour otherwise (relevant only for hourly data)
+#' @param values.to (chr) name of the new column to be added
 #' @return (data.frame) mutated table with an additional column for the
 #' cumulative sum of the growing degree-days
 #' @examples
@@ -160,9 +160,9 @@ mutate_isip_weather_with_cumsum_gdd <- function(
     t.ceiling=30,
     t.base=5,
     use.floor=FALSE,
-    values.to="cumsum_gdd",
     daily.data=FALSE,
-    max.per.day=FALSE){
+    max.per.day=FALSE,
+    values.to="cumsum_gdd"){
 
   my.tmin <- isip.df$Tmin
   my.tmax <- isip.df$Tmax
@@ -178,31 +178,43 @@ mutate_isip_weather_with_cumsum_gdd <- function(
     dplyr::arrange(.data$location, .data$date) %>%
     dplyr::mutate(year.198445789832=lubridate::year(.data$date)) %>%
     dplyr::with_groups(
-      # .groups = c(.data$location, .data$year.198445789832),
       .groups = c("location", "year.198445789832"),
-      dplyr::mutate,
-      gdd.198445789832=growing_degree_days(my.tmin, my.tmax, t.ceiling, t.base, use.floor)
+      mutate_cumsum_gdd,
+      date=.data$date, t.min=my.tmin, t.max=my.tmax, t.ceiling=t.ceiling,
+      t.base=t.base, use.floor=use.floor, hourly.data=!daily.data,
+      max.per.day=max.per.day, values.to={{values.to}}
     ) %>%
-    dplyr::with_groups(
-      # .groups = c(.data$location, .data$year.198445789832),
-      .groups = c("location", "year.198445789832"),
-      dplyr::mutate,
-      {{values.to}}:=slider::slide_index_sum(x=.data$gdd.198445789832, i=.data$date, before=Inf, complete=TRUE)/my.divider
-    ) %>%
-    # dplyr::select(-.data$gdd.198445789832, -.data$year.198445789832)
-    dplyr::select(-"gdd.198445789832", -"year.198445789832")
+    dplyr::select(-"year.198445789832")
 
-  if(max.per.day){
-    isip.df <- isip.df %>%
-      dplyr::mutate(day.198445789832=as.Date(.data$date)) %>%
-      dplyr::with_groups(
-        # .groups = c(.data$location, .data$day.198445789832),
-        .groups = c("location", "day.198445789832"),
-        dplyr::mutate,
-        {{values.to}}:=max(.data[[values.to]])
-      ) %>%
-      # dplyr::select(-.data$day.198445789832)
-      dplyr::select(-"day.198445789832")
-  }
+  # isip.df <- isip.df %>%
+  #   dplyr::arrange(.data$location, .data$date) %>%
+  #   dplyr::mutate(year.198445789832=lubridate::year(.data$date)) %>%
+  #   dplyr::with_groups(
+  #     # .groups = c(.data$location, .data$year.198445789832),
+  #     .groups = c("location", "year.198445789832"),
+  #     dplyr::mutate,
+  #     gdd.198445789832=growing_degree_days(my.tmin, my.tmax, t.ceiling, t.base, use.floor)
+  #   ) %>%
+  #   dplyr::with_groups(
+  #     # .groups = c(.data$location, .data$year.198445789832),
+  #     .groups = c("location", "year.198445789832"),
+  #     dplyr::mutate,
+  #     {{values.to}}:=slider::slide_index_sum(x=.data$gdd.198445789832, i=.data$date, before=Inf, complete=TRUE)/my.divider
+  #   ) %>%
+  #   # dplyr::select(-.data$gdd.198445789832, -.data$year.198445789832)
+  #   dplyr::select(-"gdd.198445789832", -"year.198445789832")
+  #
+  # if(max.per.day){
+  #   isip.df <- isip.df %>%
+  #     dplyr::mutate(day.198445789832=as.Date(.data$date)) %>%
+  #     dplyr::with_groups(
+  #       # .groups = c(.data$location, .data$day.198445789832),
+  #       .groups = c("location", "day.198445789832"),
+  #       dplyr::mutate,
+  #       {{values.to}}:=max(.data[[values.to]])
+  #     ) %>%
+  #     # dplyr::select(-.data$day.198445789832)
+  #     dplyr::select(-"day.198445789832")
+  # }
   return(isip.df)
 }

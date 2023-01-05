@@ -9,9 +9,9 @@ mutate_isip_weather_with_cumsum_gdd(
   t.ceiling = 30,
   t.base = 5,
   use.floor = FALSE,
-  values.to = "cumsum_gdd",
   daily.data = FALSE,
-  max.per.day = FALSE
+  max.per.day = FALSE,
+  values.to = "cumsum_gdd"
 )
 }
 \arguments{
@@ -25,15 +25,15 @@ function \code{\link[=read_isip_hourly_weather_data]{read_isip_hourly_weather_da
 \item{use.floor}{(boolean) \code{t.base} is also a floor temperature value
 if \code{TRUE}, nothing more otherwise}
 
-\item{values.to}{(chr) name of the new column to be added}
-
 \item{daily.data}{(boolean) process data as daily data if \code{TRUE}, as hourly
 data otherwise. Processing hourly data as daily data will likely result in
 only NA values in the new column. The other way around will return values
 but they will not be correct.}
 
 \item{max.per.day}{(boolean) outputs the maximum per day if \code{TRUE},
-reports for each hour otherwise}
+reports for each hour otherwise (relevant only for hourly data)}
+
+\item{values.to}{(chr) name of the new column to be added}
 }
 \value{
 (data.frame) mutated table with an additional column for the

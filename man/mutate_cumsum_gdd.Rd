@@ -13,6 +13,7 @@ mutate_cumsum_gdd(
   t.base = 5,
   use.floor = FALSE,
   hourly.data = FALSE,
+  max.per.day = FALSE,
   values.to = "cumsum_gdd"
 )
 }
@@ -41,6 +42,9 @@ if hourly data  (numeric column)}
 \item{hourly.data}{(boolean) considers the data as hourly data and divides the
 output by 24 if \code{TRUE}, considers as daily data otherwise.}
 
+\item{max.per.day}{(boolean) outputs the maximum per day if \code{TRUE},
+reports for each hour otherwise (relevant only for hourly data)}
+
 \item{values.to}{(chr) name of the new column to store the results}
 }
 \value{
@@ -60,7 +64,7 @@ point). \code{NA}s are not supported for the min and max temperatures.
 Then, the function calculates the growing degree-days independently for
 each row as defined in \code{\link[=growing_degree_days]{growing_degree_days()}}.
 Finally it calculates the cumulative sum and returns a copy of the data
-frame with a a new column for the results.
+frame with a new column for the results.
 }
 \examples{
 # given a simple data.frame with date, min and max temperature

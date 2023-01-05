@@ -60,7 +60,7 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 #' Then, the function calculates the growing degree-days independently for
 #' each row as defined in [growing_degree_days()].
 #' Finally it calculates the cumulative sum and returns a copy of the data
-#' frame with a a new column for the results.
+#' frame with a new column for the results.
 #'
 #' @param df (data.frame) table with columns for date, min and max temperatures
 #' (or date including time and hourly temperature for hourly data).
@@ -78,6 +78,8 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 #' `t.min` if `TRUE`, nothing more otherwise
 #' @param hourly.data (boolean) considers the data as hourly data and divides the
 #' output by 24 if `TRUE`, considers as daily data otherwise.
+#' @param max.per.day (boolean) outputs the maximum per day if `TRUE`,
+#' reports for each hour otherwise (relevant only for hourly data)
 #' @param values.to (chr) name of the new column to store the results
 #' @return (data.frame) table copying `df` but adding a numerical column for
 #' the cumulative sum of growing degree-days
@@ -97,15 +99,26 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 #' @importFrom rlang .data
 #' @export
 # ==============================================================================
-mutate_cumsum_gdd <- function(df, date, t.min, t.max, t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE, values.to="cumsum_gdd"){
+mutate_cumsum_gdd <- function(df, date, t.min, t.max, t.ceiling=30, t.base=5,
+                              use.floor=FALSE, hourly.data=FALSE,
+                              max.per.day=FALSE, values.to="cumsum_gdd"){
   df <- df %>%
     dplyr::mutate(gdd.19815454532=growing_degree_days({{t.min}}, {{t.max}}, t.ceiling, t.base, use.floor)) %>%
     dplyr::mutate({{values.to}}:=slider::slide_index_sum(x=.data$gdd.19815454532, i={{date}}, before=Inf, complete=TRUE)) %>%
-    # dplyr::select(-.data$gdd.19815454532)
     dplyr::select(-"gdd.19815454532")
   if(hourly.data){
     df <- df %>%
       dplyr::mutate({{values.to}}:=.data[[values.to]]/24)
+  }
+  if(max.per.day){
+    df <- df %>%
+      dplyr::mutate(day.198445789832=as.Date(.data$date)) %>%
+      dplyr::with_groups(
+        .groups = c("location", "day.198445789832"),
+        dplyr::mutate,
+        {{values.to}}:=max(.data[[values.to]])
+      ) %>%
+      dplyr::select(-"day.198445789832")
   }
   return(df)
 }
