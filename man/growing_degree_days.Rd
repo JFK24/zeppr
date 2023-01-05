@@ -39,6 +39,9 @@ If the a temperature (min or max temperature) is greater than the ceiling
 value, it is reset to the ceiling value.
 When using a floor value, if the a temperature (min or max temperature) is
 smaller than the base temperature, it is reset to the base temperature.
+Read McMaster & Wilhelm (1997) for an evaluation of the impact of using a
+floor or a ceiling value (Agricultural and Forest
+Meteorology 87(4):291-300; DOI: 10.1016/S0168-1923(97)00027-0)
 }
 \examples{
 # As the following defines, the growing degree-days gdd = ((9+12)/2)-10 = 0.5

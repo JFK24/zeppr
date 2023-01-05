@@ -37,18 +37,24 @@ from [GitHub](https://github.com/) as follows:
 ```{r eval=FALSE}
 # uncomment to install devtools if necessary:
 # install.packages("devtools")
-devtools::install_github("JFK24/zeppr@v0.2.0-beta")
+devtools::install_github("JFK24/zeppr@latest")
 ```
 
 
 ## Examples
+
+Load the package in R as usual:
+
+```{r}
+library(zeppr)
+```
+
 
 ### Normalized cumulative sum for vectors
 
 Function `normalized_cumsum()` calculates the cumulative sum normalized to [0,1].
 
 ```{r normalized_cumsum}
-library(zeppr)
 # cumulative sum without normalization
 normalized_cumsum(c(1,2,3,4,5), normalize = FALSE)
 # with normalization to the total sum (as percentage)

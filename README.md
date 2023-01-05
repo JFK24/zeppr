@@ -24,10 +24,16 @@ You can install the latest version of `zeppr` from
 ``` r
 # uncomment to install devtools if necessary:
 # install.packages("devtools")
-devtools::install_github("JFK24/zeppr@v0.2.0-beta")
+devtools::install_github("JFK24/zeppr@latest")
 ```
 
 ## Examples
+
+Load the package in R as usual:
+
+``` r
+library(zeppr)
+```
 
 ### Normalized cumulative sum for vectors
 
@@ -35,7 +41,6 @@ Function `normalized_cumsum()` calculates the cumulative sum normalized
 to \[0,1\].
 
 ``` r
-library(zeppr)
 # cumulative sum without normalization
 normalized_cumsum(c(1,2,3,4,5), normalize = FALSE)
 #> [1]  1  3  6 10 15
