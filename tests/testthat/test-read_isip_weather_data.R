@@ -6,14 +6,14 @@ test_that("test of read_isip_hourly_weather_data()", {
   hourly.table <- read_isip_hourly_weather_data(path)
   expect_s3_class(hourly.table$date, "POSIXct")
   expect_equal(c(4320, 10), dim(hourly.table))
-  expect_equal(20.97, round(max(hourly.table$temperature), 2))
-  expect_equal(-4.34, round(min(hourly.table$temperature), 2))
+  expect_equal(20.97, round(max(hourly.table$Tavg), 2))
+  expect_equal(-4.34, round(min(hourly.table$Tavg), 2))
   # Test daily data:
   daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)
   expect_s3_class(daily.table$date, "Date")
   expect_equal(c(180, 10), dim(daily.table))
-  expect_equal(11.84, round(max(daily.table$temperature), 2))
-  expect_equal(-1.46, round(min(daily.table$temperature), 2))
+  expect_equal(11.84, round(max(daily.table$Tavg), 2))
+  expect_equal(-1.46, round(min(daily.table$Tavg), 2))
 })
 
 test_that("test of mutate_isip_weather_with_cumsum_gdd()",{

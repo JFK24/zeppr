@@ -19,10 +19,9 @@
 #' @return (data.frame) table with numerical columns except for location (`chr`)
 #' and date (`Date` class for daily output or `POSIXct` class for hourly
 #' output). Columns: `location`, `date`, `Tmin` (min daily temperature),
-#' `temperature` (average temperature),
-#' `Tmax` (max daily temperature), `humidity`, `precipitation`, `radiation`,
-#' `wind_speed`, `n.hours` (scope of the data as number of hours, e.g. used to
-#' calculate averages).
+#' `Tavg` (average temperature), `Tmax` (max daily temperature), `humidity`,
+#' `precipitation`, `radiation`, `wind_speed` and
+#' `n_hours` (scope of the data as number of hours, e.g. used to calculate averages).
 #' @examples
 #' # Let us use an example dataset:
 #' file.name <- "20221215_isip_hourly_weather_data_export.xlsx"
@@ -43,7 +42,7 @@ read_isip_hourly_weather_data <- function(
     drop.irrelvant.cols=TRUE
     ){
 
-  col.names=c("ID", "date", "temperature", "humidity", "precipitation", "radiation", "irrelevant.radiation.2", "wind_speed")
+  col.names=c("ID", "date", "Tavg", "humidity", "precipitation", "radiation", "irrelevant.radiation.2", "wind_speed")
   sheet.names <- sort(readxl::excel_sheets(excel.path))
   my.table <- tibble::tibble()
   for(sheet.name in sheet.names){
@@ -53,14 +52,12 @@ read_isip_hourly_weather_data <- function(
                             col_names=col.names,
                             skip=1,
                             .name_repair = "minimal") %>%
-      # dplyr::select(-.data$ID) %>%
       dplyr::select(-"ID") %>%
       dplyr::mutate(location=my.location) %>%
       dplyr::mutate(Tmin=as.numeric(NA)) %>%
       dplyr::mutate(Tmax=as.numeric(NA)) %>%
-      dplyr::mutate(n.hours=as.integer(1)) %>%
-      # dplyr::select(.data$location, .data$date, .data$Tmin, .data$temperature, .data$Tmax, tidyselect::everything())
-      dplyr::select("location", "date", "Tmin", "temperature", "Tmax", tidyselect::everything())
+      dplyr::mutate(n_hours=as.integer(1)) %>%
+      dplyr::select("location", "date", "Tmin", "Tavg", "Tmax", tidyselect::everything())
     if(drop.irrelvant.cols){
       d <- d %>% dplyr::select(-dplyr::starts_with("irrelevant"))
     }
@@ -72,17 +69,17 @@ read_isip_hourly_weather_data <- function(
       dplyr::select("date", "location", tidyselect::everything()) %>%
       dplyr::group_by(.data$location, .data$date) %>%
       dplyr::summarise(
-        Tmin=min(.data$temperature),
-        "Tavg"=mean(.data$temperature),
-        Tmax=max(.data$temperature),
+        Tmin=min(.data$Tavg),
+        Tmax=max(.data$Tavg),
+        Tavg=mean(.data$Tavg),
         humidity=mean(.data$humidity),
         precipitation=mean(.data$precipitation),
         radiation=mean(.data$radiation),
         wind_speed=mean(.data$wind_speed),
-        n.hours=dplyr::n(),
+        n_hours=dplyr::n(),
         .groups="drop"
       ) %>%
-      dplyr::rename(temperature="Tavg")
+      dplyr::select("location", "date", "Tmin", "Tavg", "Tmax", dplyr::everything())
   }
   return(my.table %>% dplyr::arrange(.data$location, .data$date))
 }
@@ -105,7 +102,7 @@ read_isip_hourly_weather_data <- function(
 #' @param isip.df (data.frame) table of weather data created with
 #' function [read_isip_hourly_weather_data()]
 #' @param t.ceiling (dbl) ceiling temperature value
-#' @param t.base (dbl) base temperature (base growth temperature)
+#' @param t.base (dbl) base growth temperature
 #' @param use.floor (boolean) `t.base` is also a floor temperature value
 #' if `TRUE`, nothing more otherwise
 #' @param values.to (chr) name of the new column to be added
@@ -127,7 +124,7 @@ read_isip_hourly_weather_data <- function(
 #' # Reads hourly data and derive results by hours with or without day summary:
 #' # ---------------------------------------------------------------------------
 #' # reads file and keep 10 rows (10 hours) only
-#' hourly.table <- read_isip_hourly_weather_data(path)[1:10,]
+#' hourly.table <- read_isip_hourly_weather_data(path)[1:5,]
 #' # adds cumulative growing degree-days per row divided by 24
 #' mutate_isip_weather_with_cumsum_gdd(hourly.table)
 #' # keep maximum value per day
@@ -136,7 +133,7 @@ read_isip_hourly_weather_data <- function(
 #' # Reads as daily data and derive results by days with or without floor value:
 #' # ---------------------------------------------------------------------------
 #' # reads file and keep 10 rows (10 days) only
-#' daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:10,]
+#' daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:5,]
 #' # adds cumulative growing degree-days per row
 #' mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 #' # use floor value for min and max temperatures
@@ -171,8 +168,10 @@ mutate_isip_weather_with_cumsum_gdd <- function(
   my.tmax <- isip.df$Tmax
   my.divider <- 1
   if(!daily.data) {
-    my.tmin <- isip.df$temperature
-    my.tmax <- isip.df$temperature
+    # my.tmin <- isip.df$temperature
+    # my.tmax <- isip.df$temperature
+    my.tmin <- isip.df$Tavg
+    my.tmax <- isip.df$Tavg
     my.divider <- 24
   }
   isip.df <- isip.df %>%

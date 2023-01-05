@@ -20,7 +20,7 @@ function \code{\link[=read_isip_hourly_weather_data]{read_isip_hourly_weather_da
 
 \item{t.ceiling}{(dbl) ceiling temperature value}
 
-\item{t.base}{(dbl) base temperature (base growth temperature)}
+\item{t.base}{(dbl) base growth temperature}
 
 \item{use.floor}{(boolean) \code{t.base} is also a floor temperature value
 if \code{TRUE}, nothing more otherwise}
@@ -61,7 +61,7 @@ path <- system.file("extdata", file, package = "zeppr")
 # Reads hourly data and derive results by hours with or without day summary:
 # ---------------------------------------------------------------------------
 # reads file and keep 10 rows (10 hours) only
-hourly.table <- read_isip_hourly_weather_data(path)[1:10,]
+hourly.table <- read_isip_hourly_weather_data(path)[1:5,]
 # adds cumulative growing degree-days per row divided by 24
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
 # keep maximum value per day
@@ -70,7 +70,7 @@ mutate_isip_weather_with_cumsum_gdd(hourly.table, max.per.day=TRUE)
 # Reads as daily data and derive results by days with or without floor value:
 # ---------------------------------------------------------------------------
 # reads file and keep 10 rows (10 days) only
-daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:10,]
+daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:5,]
 # adds cumulative growing degree-days per row
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 # use floor value for min and max temperatures

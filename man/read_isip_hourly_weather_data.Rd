@@ -24,10 +24,9 @@ keep all columns otherwise}
 (data.frame) table with numerical columns except for location (\code{chr})
 and date (\code{Date} class for daily output or \code{POSIXct} class for hourly
 output). Columns: \code{location}, \code{date}, \code{Tmin} (min daily temperature),
-\code{temperature} (average temperature),
-\code{Tmax} (max daily temperature), \code{humidity}, \code{precipitation}, \code{radiation},
-\code{wind_speed}, \code{n.hours} (scope of the data as number of hours, e.g. used to
-calculate averages).
+\code{Tavg} (average temperature), \code{Tmax} (max daily temperature), \code{humidity},
+\code{precipitation}, \code{radiation}, \code{wind_speed} and
+\code{n_hours} (scope of the data as number of hours, e.g. used to calculate averages).
 }
 \description{
 Reads an ISIP hourly weather export data file (Excel file; one row per hour)
