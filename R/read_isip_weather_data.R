@@ -168,8 +168,6 @@ mutate_isip_weather_with_cumsum_gdd <- function(
   my.tmax <- isip.df$Tmax
   my.divider <- 1
   if(!daily.data) {
-    # my.tmin <- isip.df$temperature
-    # my.tmax <- isip.df$temperature
     my.tmin <- isip.df$Tavg
     my.tmax <- isip.df$Tavg
     my.divider <- 24
@@ -185,36 +183,5 @@ mutate_isip_weather_with_cumsum_gdd <- function(
       max.per.day=max.per.day, values.to={{values.to}}
     ) %>%
     dplyr::select(-"year.198445789832")
-
-  # isip.df <- isip.df %>%
-  #   dplyr::arrange(.data$location, .data$date) %>%
-  #   dplyr::mutate(year.198445789832=lubridate::year(.data$date)) %>%
-  #   dplyr::with_groups(
-  #     # .groups = c(.data$location, .data$year.198445789832),
-  #     .groups = c("location", "year.198445789832"),
-  #     dplyr::mutate,
-  #     gdd.198445789832=growing_degree_days(my.tmin, my.tmax, t.ceiling, t.base, use.floor)
-  #   ) %>%
-  #   dplyr::with_groups(
-  #     # .groups = c(.data$location, .data$year.198445789832),
-  #     .groups = c("location", "year.198445789832"),
-  #     dplyr::mutate,
-  #     {{values.to}}:=slider::slide_index_sum(x=.data$gdd.198445789832, i=.data$date, before=Inf, complete=TRUE)/my.divider
-  #   ) %>%
-  #   # dplyr::select(-.data$gdd.198445789832, -.data$year.198445789832)
-  #   dplyr::select(-"gdd.198445789832", -"year.198445789832")
-  #
-  # if(max.per.day){
-  #   isip.df <- isip.df %>%
-  #     dplyr::mutate(day.198445789832=as.Date(.data$date)) %>%
-  #     dplyr::with_groups(
-  #       # .groups = c(.data$location, .data$day.198445789832),
-  #       .groups = c("location", "day.198445789832"),
-  #       dplyr::mutate,
-  #       {{values.to}}:=max(.data[[values.to]])
-  #     ) %>%
-  #     # dplyr::select(-.data$day.198445789832)
-  #     dplyr::select(-"day.198445789832")
-  # }
   return(isip.df)
 }
