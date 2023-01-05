@@ -79,10 +79,10 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 #' @param t.base (dbl) base growth temperature
 #' @param use.floor (boolean) `t.base` is also a floor value for `t.max` and
 #' `t.min` if `TRUE`, nothing more otherwise
-#' @param hourly.data (boolean) considers the data as hourly data and divides the
-#' output by 24 if `TRUE`, considers as daily data otherwise.
-#' @param max.per.day (boolean) outputs the maximum per day if `TRUE`,
-#' reports for each hour otherwise (relevant only for hourly data)
+#' @param hourly.data (boolean) considers the data as hourly data and thus
+#' divides the values by 24 if `TRUE`, considers as daily data otherwise.
+#' @param max.per.day (boolean) retains the maximum value per day if `TRUE`
+#' (relevant only for hourly data)
 #' @param values.to (chr) name of the new column to store the results
 #' @return (data.frame) table copying `df` but adding a numerical column for
 #' the cumulative sum of growing degree-days
