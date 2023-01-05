@@ -24,7 +24,7 @@ You can install the latest version of `zeppr` from
 ``` r
 # uncomment to install devtools if necessary:
 # install.packages("devtools")
-devtools::install_github("JFK24/zeppr@v0.1.0-beta")
+devtools::install_github("JFK24/zeppr@v0.2.0-beta")
 ```
 
 ## Examples
