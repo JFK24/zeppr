@@ -13,7 +13,7 @@ mutate_cumsum_gdd(
   t.base = 5,
   use.floor = FALSE,
   hourly.data = FALSE,
-  values_to = "cumsum_gdd"
+  values.to = "cumsum_gdd"
 )
 }
 \arguments{
@@ -41,7 +41,7 @@ if hourly data  (numeric column)}
 \item{hourly.data}{(boolean) considers the data as hourly data and divides the
 output by 24 if \code{TRUE}, considers as daily data otherwise.}
 
-\item{values_to}{(chr) name of the new column to store the results}
+\item{values.to}{(chr) name of the new column to store the results}
 }
 \value{
 (data.frame) table copying \code{df} but adding a numerical column for

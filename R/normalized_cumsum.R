@@ -9,7 +9,7 @@
 #'
 #' @param values (numeric) vector of numerical values
 #' @param normalize (boolean) returns normalized cumulative sum if `TRUE`, simple cumulative sum otherwise
-#' @param na_replace (dbl) numeric value used to replace `NA` values (default=`NA` to not replace)
+#' @param na.replace (dbl) numeric value used to replace `NA` values (default=`NA` to not replace)
 #' @return (numeric) vector of the cumulative sum normalized by default from 0 to 1
 #' @examples
 #' # Simple case:
@@ -19,13 +19,13 @@
 #' # NAs are not processed by default:
 #' normalized_cumsum(c(1,2,3,4, NA, 5))
 #' # replace NAs by 0 before summing:
-#' normalized_cumsum(c(1,2,3,4, NA, 5), na_replace=0)
+#' normalized_cumsum(c(1,2,3,4, NA, 5), na.replace=0)
 #' @export
 # ==============================================================================
-normalized_cumsum <- function(values, normalize=TRUE, na_replace=NA){
+normalized_cumsum <- function(values, normalize=TRUE, na.replace=NA){
   my.values <- values
-  if(!is.na(na_replace) & is.numeric(na_replace)){
-    my.values[is.na(my.values)] <- na_replace
+  if(!is.na(na.replace) & is.numeric(na.replace)){
+    my.values[is.na(my.values)] <- na.replace
   }
   if(normalize){
     return(cumsum(my.values) / sum(my.values, na.rm=TRUE))

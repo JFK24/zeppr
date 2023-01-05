@@ -30,14 +30,16 @@ Commercial users may contact the package developer.
 
 This package was developed using R 4.2.2. 
 The library `devtools` is also required. 
-You can install the development version of `zeppr` 
-from [GitHub](https://github.com/) by uncommenting the following code:
+
+You can install the latest version of `zeppr` 
+from [GitHub](https://github.com/) as follows:
 
 ```{r eval=FALSE}
 # uncomment to install devtools if necessary:
 # install.packages("devtools")
- devtools::install_github("JFK24/zeppr")
+devtools::install_github("JFK24/zeppr@v0.1.0-beta")
 ```
+
 
 ## Examples
 
@@ -124,7 +126,7 @@ mutate_cumsum_gdd(daily.table, date=Date, t.min=Tmin, t.max=Tmax,
                   t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE)
 # With %>% pipes from magrittr and custom column name:
 library(magrittr)
-daily.table %>% mutate_cumsum_gdd(Date, Tmin, Tmax, values_to="my_gdd")
+daily.table %>% mutate_cumsum_gdd(Date, Tmin, Tmax, values.to="my_gdd")
 ```
 
 #### For hourly data
@@ -144,9 +146,9 @@ mutate_cumsum_gdd(hourly.table, date=date.time,
 # Same with %>% pipes from magrittr and custom column names for various parameters:
 library(magrittr)
 hourly.table %>% 
-  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd_2", t.base = 2) %>% 
-  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd_3", t.base = 3) %>% 
-  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd_4", t.base = 4)
+  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values.to="my_gdd_2", t.base = 2) %>% 
+  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values.to="my_gdd_3", t.base = 3) %>% 
+  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values.to="my_gdd_4", t.base = 4)
   
 ```
 
@@ -200,7 +202,7 @@ hourly.table <- read_isip_hourly_weather_data(path)[1:6,1:5]
 # adds cumulative growing degree-days per hour
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
 # keeps only the maximum value per day
-mutate_isip_weather_with_cumsum_gdd(hourly.table, max_per_day=TRUE)
+mutate_isip_weather_with_cumsum_gdd(hourly.table, max.per.day=TRUE)
 ```
 
 Processing daily data:

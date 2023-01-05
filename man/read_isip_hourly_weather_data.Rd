@@ -24,7 +24,7 @@ keep all columns otherwise}
 (data.frame) table with numerical columns except for location (\code{chr})
 and date (\code{Date} class for daily output or \code{POSIXct} class for hourly
 output). Columns: \code{location}, \code{date}, \code{Tmin} (min daily temperature),
-\code{temperature} (hourly or averaged daily temperature),
+\code{temperature} (average temperature),
 \code{Tmax} (max daily temperature), \code{humidity}, \code{precipitation}, \code{radiation},
 \code{wind_speed}, \code{n.hours} (scope of the data as number of hours, e.g. used to
 calculate averages).
@@ -34,9 +34,9 @@ Reads an ISIP hourly weather export data file (Excel file; one row per hour)
 and returns a data frame with either hourly or daily data.
 The daily data is derived from the hourly data by averaging values per day.
 All sheets from the Excel file are processed and gathered in the same table.
-Within an ISIP Excel file, each sheet represent a particular geographical
+Within an ISIP Excel file, each sheet represents a particular geographical
 location and contains weather data for the same date and time range.
-Sheet names provides the location ids after trimming a suffix
+Sheet names provide the location ids after trimming a suffix
 starting from the last underscore character.
 }
 \examples{

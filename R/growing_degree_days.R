@@ -7,7 +7,11 @@
 #' A pair is defined as 2 values at same position in the vectors.
 #' Although no time data is required here for the calculation,
 #' each pair represents implicitly a time point: either 1 day or 1 hour.
-#' Basic Formula: ((max temperature + min temperature)/2) - base temperature
+#' Basic Formula: ((max temperature + min temperature)/2) - base temperature.
+#' If the a temperature (min or max temperature) is greater than the ceiling
+#' value, it is reset to the ceiling value.
+#' When using a floor value, if the a temperature (min or max temperature) is
+#' smaller than the base temperature, it is reset to the base temperature.
 #'
 #' @param t.min (numeric) vector of minimum day temperatures
 #' @param t.max (numeric) vector of maximum day temperatures (same length as `t.min`)
@@ -74,7 +78,7 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 #' `t.min` if `TRUE`, nothing more otherwise
 #' @param hourly.data (boolean) considers the data as hourly data and divides the
 #' output by 24 if `TRUE`, considers as daily data otherwise.
-#' @param values_to (chr) name of the new column to store the results
+#' @param values.to (chr) name of the new column to store the results
 #' @return (data.frame) table copying `df` but adding a numerical column for
 #' the cumulative sum of growing degree-days
 #' @examples
@@ -93,15 +97,15 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 #' @importFrom rlang .data
 #' @export
 # ==============================================================================
-mutate_cumsum_gdd <- function(df, date, t.min, t.max, t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE, values_to="cumsum_gdd"){
+mutate_cumsum_gdd <- function(df, date, t.min, t.max, t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE, values.to="cumsum_gdd"){
   df <- df %>%
     dplyr::mutate(gdd.19815454532=growing_degree_days({{t.min}}, {{t.max}}, t.ceiling, t.base, use.floor)) %>%
-    dplyr::mutate({{values_to}}:=slider::slide_index_sum(x=.data$gdd.19815454532, i={{date}}, before=Inf, complete=TRUE)) %>%
+    dplyr::mutate({{values.to}}:=slider::slide_index_sum(x=.data$gdd.19815454532, i={{date}}, before=Inf, complete=TRUE)) %>%
     # dplyr::select(-.data$gdd.19815454532)
     dplyr::select(-"gdd.19815454532")
   if(hourly.data){
     df <- df %>%
-      dplyr::mutate({{values_to}}:=.data[[values_to]]/24)
+      dplyr::mutate({{values.to}}:=.data[[values.to]]/24)
   }
   return(df)
 }

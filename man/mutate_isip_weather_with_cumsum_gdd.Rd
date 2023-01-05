@@ -9,9 +9,9 @@ mutate_isip_weather_with_cumsum_gdd(
   t.ceiling = 30,
   t.base = 5,
   use.floor = FALSE,
-  values_to = "cumsum_gdd",
+  values.to = "cumsum_gdd",
   daily.data = FALSE,
-  max_per_day = FALSE
+  max.per.day = FALSE
 )
 }
 \arguments{
@@ -25,14 +25,14 @@ function \code{\link[=read_isip_hourly_weather_data]{read_isip_hourly_weather_da
 \item{use.floor}{(boolean) \code{t.base} is also a floor temperature value
 if \code{TRUE}, nothing more otherwise}
 
-\item{values_to}{(chr) name of the new column to be added}
+\item{values.to}{(chr) name of the new column to be added}
 
 \item{daily.data}{(boolean) process data as daily data if \code{TRUE}, as hourly
 data otherwise. Processing hourly data as daily data will likely result in
 only NA values in the new column. The other way around will return values
 but they will not be correct.}
 
-\item{max_per_day}{(boolean) outputs the maximum per day if \code{TRUE},
+\item{max.per.day}{(boolean) outputs the maximum per day if \code{TRUE},
 reports for each hour otherwise}
 }
 \value{
@@ -49,6 +49,7 @@ location and year, and then the cumulative sum of growing degree-days at
 each time point (each day or each hour) will be stored in a new column.
 Make sure that the \code{daily.data} parameter is appropriately set to fit
 your data.
+Growing degree-days are calculated as defined in function \code{\link[=growing_degree_days]{growing_degree_days()}}.
 }
 \examples{
 # ---------------------------------------------------------------------------
@@ -64,7 +65,7 @@ hourly.table <- read_isip_hourly_weather_data(path)[1:10,]
 # adds cumulative growing degree-days per row divided by 24
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
 # keep maximum value per day
-mutate_isip_weather_with_cumsum_gdd(hourly.table, max_per_day=TRUE)
+mutate_isip_weather_with_cumsum_gdd(hourly.table, max.per.day=TRUE)
 # ---------------------------------------------------------------------------
 # Reads as daily data and derive results by days with or without floor value:
 # ---------------------------------------------------------------------------
@@ -81,9 +82,9 @@ library(magrittr)
 hourly.table <- read_isip_hourly_weather_data(path)[1:48,]
 hourly.table \%>\%
   mutate_isip_weather_with_cumsum_gdd(
-    t.ceiling=26, t.base=6, use.floor=TRUE, values_to="cs_gdd_1") \%>\%
+    t.ceiling=26, t.base=6, use.floor=TRUE, values.to="cs_gdd_1") \%>\%
   mutate_isip_weather_with_cumsum_gdd(
-    t.ceiling=26, t.base=6, use.floor=TRUE, values_to="cs_gdd_2",
-    max_per_day=TRUE) \%>\%
+    t.ceiling=26, t.base=6, use.floor=TRUE, values.to="cs_gdd_2",
+    max.per.day=TRUE) \%>\%
   print(n=48)
 }

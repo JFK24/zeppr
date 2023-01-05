@@ -16,13 +16,15 @@ developer.
 ## Installation
 
 This package was developed using R 4.2.2. The library `devtools` is also
-required. You can install the development version of `zeppr` from
-[GitHub](https://github.com/) by uncommenting the following code:
+required.
+
+You can install the latest version of `zeppr` from
+[GitHub](https://github.com/) as follows:
 
 ``` r
 # uncomment to install devtools if necessary:
 # install.packages("devtools")
- devtools::install_github("JFK24/zeppr")
+devtools::install_github("JFK24/zeppr@v0.1.0-beta")
 ```
 
 ## Examples
@@ -120,7 +122,7 @@ mutate_cumsum_gdd(daily.table, date=Date, t.min=Tmin, t.max=Tmax,
 #> 3 2022-01-03   11   20       18.5
 # With %>% pipes from magrittr and custom column name:
 library(magrittr)
-daily.table %>% mutate_cumsum_gdd(Date, Tmin, Tmax, values_to="my_gdd")
+daily.table %>% mutate_cumsum_gdd(Date, Tmin, Tmax, values.to="my_gdd")
 #>         Date Tmin Tmax my_gdd
 #> 1 2022-01-01    4   12    3.0
 #> 2 2022-01-02    6   14    8.0
@@ -148,9 +150,9 @@ mutate_cumsum_gdd(hourly.table, date=date.time,
 # Same with %>% pipes from magrittr and custom column names for various parameters:
 library(magrittr)
 hourly.table %>% 
-  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd_2", t.base = 2) %>% 
-  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd_3", t.base = 3) %>% 
-  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values_to="my_gdd_4", t.base = 4)
+  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values.to="my_gdd_2", t.base = 2) %>% 
+  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values.to="my_gdd_3", t.base = 3) %>% 
+  mutate_cumsum_gdd(date.time, temperature, temperature, hourly.data=TRUE, values.to="my_gdd_4", t.base = 4)
 #>             date.time temperature  my_gdd_2  my_gdd_3  my_gdd_4
 #> 1 2022-01-01 13:00:00          12 0.4166667 0.3750000 0.3333333
 #> 2 2022-01-02 14:00:00          14 0.9166667 0.8333333 0.7500000
@@ -234,7 +236,7 @@ mutate_isip_weather_with_cumsum_gdd(hourly.table)
 #> 5 BWWR100  2022-01-01 04:00:00    NA        9.01    NA      0.902
 #> 6 BWWR100  2022-01-01 05:00:00    NA        8.80    NA      1.06
 # keeps only the maximum value per day
-mutate_isip_weather_with_cumsum_gdd(hourly.table, max_per_day=TRUE)
+mutate_isip_weather_with_cumsum_gdd(hourly.table, max.per.day=TRUE)
 #> # A tibble: 6 × 6
 #>   location date                 Tmin temperature  Tmax cumsum_gdd
 #>   <chr>    <dttm>              <dbl>       <dbl> <dbl>      <dbl>

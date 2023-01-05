@@ -34,7 +34,11 @@ Min and max Temperature values are provided as 2 vectors of same size.
 A pair is defined as 2 values at same position in the vectors.
 Although no time data is required here for the calculation,
 each pair represents implicitly a time point: either 1 day or 1 hour.
-Basic Formula: ((max temperature + min temperature)/2) - base temperature
+Basic Formula: ((max temperature + min temperature)/2) - base temperature.
+If the a temperature (min or max temperature) is greater than the ceiling
+value, it is reset to the ceiling value.
+When using a floor value, if the a temperature (min or max temperature) is
+smaller than the base temperature, it is reset to the base temperature.
 }
 \examples{
 # As the following defines, the growing degree-days gdd = ((9+12)/2)-10 = 0.5
