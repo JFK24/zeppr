@@ -60,8 +60,8 @@ path <- system.file("extdata", file, package = "zeppr")
 # ---------------------------------------------------------------------------
 # Reads hourly data and derive results by hours with or without day summary:
 # ---------------------------------------------------------------------------
-# reads file and keep 10 rows (10 hours) only
-hourly.table <- read_isip_hourly_weather_data(path)[1:5,]
+# reads file and keeps only 5 columns and 6 rows (6 hours)
+hourly.table <- read_isip_hourly_weather_data(path)[1:6,1:5]
 # adds cumulative growing degree-days per row divided by 24
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
 # keep maximum value per day
@@ -69,8 +69,8 @@ mutate_isip_weather_with_cumsum_gdd(hourly.table, max.per.day=TRUE)
 # ---------------------------------------------------------------------------
 # Reads as daily data and derive results by days with or without floor value:
 # ---------------------------------------------------------------------------
-# reads file and keep 10 rows (10 days) only
-daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:5,]
+# reads file and keeps only 5 columns and 6 rows (6 days)
+daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:6,1:5]
 # adds cumulative growing degree-days per row
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 # use floor value for min and max temperatures
@@ -79,7 +79,7 @@ mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE
 # Apply 2 times the function with magrittr pipes and tuned parameters:
 # ---------------------------------------------------------------------------
 library(magrittr)
-hourly.table <- read_isip_hourly_weather_data(path)[1:48,]
+hourly.table <- read_isip_hourly_weather_data(path)[1:48,1:5]
 hourly.table \%>\%
   mutate_isip_weather_with_cumsum_gdd(
     t.ceiling=26, t.base=6, use.floor=TRUE, values.to="cs_gdd_1") \%>\%

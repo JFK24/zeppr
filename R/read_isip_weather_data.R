@@ -164,24 +164,30 @@ mutate_isip_weather_with_cumsum_gdd <- function(
     max.per.day=FALSE,
     values.to="cumsum_gdd"){
 
-  my.tmin <- isip.df$Tmin
-  my.tmax <- isip.df$Tmax
-  my.divider <- 1
-  if(!daily.data) {
-    my.tmin <- isip.df$Tavg
-    my.tmax <- isip.df$Tavg
-    my.divider <- 24
-  }
   isip.df <- isip.df %>%
     dplyr::arrange(.data$location, .data$date) %>%
-    dplyr::mutate(year.198445789832=lubridate::year(.data$date)) %>%
-    dplyr::with_groups(
-      .groups = c("location", "year.198445789832"),
-      mutate_cumsum_gdd,
-      date=.data$date, t.min=my.tmin, t.max=my.tmax, t.ceiling=t.ceiling,
-      t.base=t.base, use.floor=use.floor, hourly.data=!daily.data,
-      max.per.day=max.per.day, values.to={{values.to}}
-    ) %>%
-    dplyr::select(-"year.198445789832")
+    dplyr::mutate(year.198445789832=lubridate::year(.data$date))
+
+  if(daily.data){
+    isip.df <- isip.df %>%
+      dplyr::with_groups(
+        .groups = c("location", "year.198445789832"),
+        zeppr::mutate_cumsum_gdd,
+        date=.data$date, t.min=.data$Tmin, t.max=.data$Tmax, t.ceiling=t.ceiling,
+        t.base=t.base, use.floor=use.floor, hourly.data=!daily.data,
+        max.per.day=max.per.day, values.to={{values.to}}
+      ) %>%
+      dplyr::select(-"year.198445789832")
+  } else{
+    isip.df <- isip.df %>%
+      dplyr::with_groups(
+        .groups = c("location", "year.198445789832"),
+        zeppr::mutate_cumsum_gdd,
+        date=.data$date, t.min=.data$Tavg, t.max=.data$Tavg, t.ceiling=t.ceiling,
+        t.base=t.base, use.floor=use.floor, hourly.data=!daily.data,
+        max.per.day=max.per.day, values.to={{values.to}}
+      ) %>%
+      dplyr::select(-"year.198445789832")
+  }
   return(isip.df)
 }

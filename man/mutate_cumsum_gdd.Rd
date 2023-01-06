@@ -39,11 +39,11 @@ if hourly data  (numeric column)}
 \item{use.floor}{(boolean) \code{t.base} is also a floor value for \code{t.max} and
 \code{t.min} if \code{TRUE}, nothing more otherwise}
 
-\item{hourly.data}{(boolean) considers the data as hourly data and divides the
-output by 24 if \code{TRUE}, considers as daily data otherwise.}
+\item{hourly.data}{(boolean) considers the data as hourly data and thus
+divides the values by 24 if \code{TRUE}, considers as daily data otherwise.}
 
-\item{max.per.day}{(boolean) outputs the maximum per day if \code{TRUE},
-reports for each hour otherwise (relevant only for hourly data)}
+\item{max.per.day}{(boolean) retains the maximum value per day if \code{TRUE}
+(relevant only for hourly data)}
 
 \item{values.to}{(chr) name of the new column to store the results}
 }

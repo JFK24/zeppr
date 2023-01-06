@@ -105,8 +105,9 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 mutate_cumsum_gdd <- function(df, date, t.min, t.max, t.ceiling=30, t.base=5,
                               use.floor=FALSE, hourly.data=FALSE,
                               max.per.day=FALSE, values.to="cumsum_gdd"){
+
   df <- df %>%
-    dplyr::mutate(gdd.19815454532=growing_degree_days({{t.min}}, {{t.max}}, t.ceiling, t.base, use.floor)) %>%
+    dplyr::mutate("gdd.19815454532"=growing_degree_days({{t.min}}, {{t.max}}, t.ceiling, t.base, use.floor)) %>%
     dplyr::mutate({{values.to}}:=slider::slide_index_sum(x=.data$gdd.19815454532, i={{date}}, before=Inf, complete=TRUE)) %>%
     dplyr::select(-"gdd.19815454532")
   if(hourly.data){

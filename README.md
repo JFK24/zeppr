@@ -27,13 +27,37 @@ You can install the latest version of `zeppr` from
 devtools::install_github("JFK24/zeppr@latest")
 ```
 
-## Examples
+## Use case
 
 Load the package in R as usual:
 
 ``` r
 library(zeppr)
 ```
+
+We have some count data
+
+We have corresponding weather data manually downloaded from the ISIP
+service
+
+``` r
+file.name <- "20221215_isip_hourly_weather_data_export.xlsx"
+path <- system.file("extdata", file.name, package = "zeppr")
+daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)
+head(daily.table)
+#> # A tibble: 6 × 10
+#>   location date        Tmin  Tavg  Tmax humidity preci…¹ radia…² wind_…³ n_hours
+#>   <chr>    <date>     <dbl> <dbl> <dbl>    <dbl>   <dbl>   <dbl>   <dbl>   <int>
+#> 1 BWWR100  2022-01-01  4.86  9.37 14.1      91.0  0        51.8    0.774      24
+#> 2 BWWR100  2022-01-02  3.44  7.84 12.9      85.8  0        29.5    1.82       24
+#> 3 BWWR100  2022-01-03  9.39 11.2  13.1      76.1  0.0542   16.4    3.48       24
+#> 4 BWWR100  2022-01-04  4.51  8.51 11.9      94.8  1.52      6.33   2.86       24
+#> 5 BWWR100  2022-01-05  2.29  3.45  5.75     81.8  0        36.4    2.84       24
+#> 6 BWWR100  2022-01-06 -1.09  2.34  4.71     90.6  0        35.3    1.60       24
+#> # … with abbreviated variable names ¹​precipitation, ²​radiation, ³​wind_speed
+```
+
+## Functions
 
 ### Normalized cumulative sum for vectors
 
@@ -48,6 +72,8 @@ normalized_cumsum(c(1,2,3,4,5), normalize = FALSE)
 normalized_cumsum(c(1,2,3,4,5))
 #> [1] 0.06666667 0.20000000 0.40000000 0.66666667 1.00000000
 ```
+
+mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 
 ### Growing degree-days for vectors
 

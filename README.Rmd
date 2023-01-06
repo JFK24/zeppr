@@ -41,13 +41,33 @@ devtools::install_github("JFK24/zeppr@latest")
 ```
 
 
-## Examples
+## Use case (TO DO)
 
 Load the package in R as usual:
 
 ```{r}
 library(zeppr)
 ```
+
+We have some count data
+
+```{r}
+
+```
+
+
+We have corresponding weather data manually downloaded from the ISIP service
+
+```{r}
+file.name <- "20221215_isip_hourly_weather_data_export.xlsx"
+path <- system.file("extdata", file.name, package = "zeppr")
+daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)
+head(daily.table)
+```
+
+
+
+## Functions
 
 
 ### Normalized cumulative sum for vectors
@@ -60,6 +80,9 @@ normalized_cumsum(c(1,2,3,4,5), normalize = FALSE)
 # with normalization to the total sum (as percentage)
 normalized_cumsum(c(1,2,3,4,5))
 ```
+
+
+mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 
 
 ### Growing degree-days for vectors
