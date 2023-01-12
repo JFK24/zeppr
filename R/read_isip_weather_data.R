@@ -111,6 +111,8 @@ read_isip_hourly_weather_data <- function(
 #' but they will not be correct.
 #' @param max.per.day (boolean) outputs the maximum per day if `TRUE`,
 #' reports for each hour otherwise (relevant only for hourly data)
+#' @param start.month (integer from 1 to 12) within a year, calculations start from this given month (before this month all values are set to 0)
+#' @param start.monthday (integer from 1 to 31) within the starting month of a year (`start.month`), calculations start from this given day (before this day all values are set to 0)
 #' @param values.to (chr) name of the new column to be added
 #' @return (data.frame) mutated table with an additional column for the
 #' cumulative sum of the growing degree-days
@@ -162,32 +164,40 @@ mutate_isip_weather_with_cumsum_gdd <- function(
     use.floor=FALSE,
     daily.data=FALSE,
     max.per.day=FALSE,
+    start.month=1,
+    start.monthday=1,
     values.to="cumsum_gdd"){
 
   isip.df <- isip.df %>%
     dplyr::arrange(.data$location, .data$date) %>%
-    dplyr::mutate(year.198445789832=lubridate::year(.data$date))
+    dplyr::mutate(year.198445789832=lubridate::year(.data$date)) %>%
+    dplyr::mutate(month.198445789832=lubridate::month(.data$date)) %>%
+    dplyr::mutate(day.198445789832b=lubridate::day(.data$date)) %>%
+    dplyr::mutate(counting=ifelse(.data$month.198445789832<start.month, 0, 1)) %>%
+    dplyr::mutate(counting=ifelse(.data$month.198445789832==start.month & .data$day.198445789832b<start.monthday, 0, .data$counting))
 
   if(daily.data){
     isip.df <- isip.df %>%
       dplyr::with_groups(
-        .groups = c("location", "year.198445789832"),
+        .groups = c("location", "year.198445789832", "counting"),
         zeppr::mutate_cumsum_gdd,
         date=.data$date, t.min=.data$Tmin, t.max=.data$Tmax, t.ceiling=t.ceiling,
         t.base=t.base, use.floor=use.floor, hourly.data=!daily.data,
         max.per.day=max.per.day, values.to={{values.to}}
       ) %>%
-      dplyr::select(-"year.198445789832")
+      dplyr::mutate({{values.to}}:= .data[[values.to]] * .data$counting) %>%
+      dplyr::select(-"year.198445789832", -"month.198445789832", -"day.198445789832b", -"counting")
   } else{
     isip.df <- isip.df %>%
       dplyr::with_groups(
-        .groups = c("location", "year.198445789832"),
+        .groups = c("location", "year.198445789832", "counting"),
         zeppr::mutate_cumsum_gdd,
         date=.data$date, t.min=.data$Tavg, t.max=.data$Tavg, t.ceiling=t.ceiling,
         t.base=t.base, use.floor=use.floor, hourly.data=!daily.data,
         max.per.day=max.per.day, values.to={{values.to}}
       ) %>%
-      dplyr::select(-"year.198445789832")
+      dplyr::mutate({{values.to}}:= .data[[values.to]] * .data$counting) %>%
+      dplyr::select(-"year.198445789832", -"month.198445789832", -"day.198445789832b", -"counting")
   }
   return(isip.df)
 }

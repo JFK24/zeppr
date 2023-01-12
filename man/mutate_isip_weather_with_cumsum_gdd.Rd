@@ -11,6 +11,8 @@ mutate_isip_weather_with_cumsum_gdd(
   use.floor = FALSE,
   daily.data = FALSE,
   max.per.day = FALSE,
+  start.month = 1,
+  start.monthday = 1,
   values.to = "cumsum_gdd"
 )
 }
@@ -32,6 +34,10 @@ but they will not be correct.}
 
 \item{max.per.day}{(boolean) outputs the maximum per day if \code{TRUE},
 reports for each hour otherwise (relevant only for hourly data)}
+
+\item{start.month}{(integer from 1 to 12) within a year, calculations start from this given month (before this month all values are set to 0)}
+
+\item{start.monthday}{(integer from 1 to 31) within the starting month of a year (\code{start.month}), calculations start from this given day (before this day all values are set to 0)}
 
 \item{values.to}{(chr) name of the new column to be added}
 }
