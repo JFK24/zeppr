@@ -15,49 +15,91 @@ developer.
 
 ## Installation
 
-This package was developed using R 4.2.2. The library `devtools` is also
-required.
+This package is available from [GitHub](https://github.com/) and was
+developed using R 4.2.2. The library `devtools` is required for
+installation.
 
-You can install the latest version of `zeppr` from
-[GitHub](https://github.com/) as follows:
+You can install a specific release of `zeppr` as follows to get a stable
+set of features:
 
 ``` r
 # uncomment to install devtools if necessary:
 # install.packages("devtools")
-devtools::install_github("JFK24/zeppr@latest")
+
+# Install release v0.2.1-beta (change release tag as required):
+devtools::install_github("JFK24/zeppr@v0.2.1-beta") 
 ```
 
-## Use case
+Alternatively, you can install the development version of `zeppr` as
+follows to get potential new features but also new potential new bugs:
 
-Load the package in R as usual:
+``` r
+devtools::install_github("JFK24/zeppr")
+```
+
+## Simple use case
+
+We first load the package as follows:
 
 ``` r
 library(zeppr)
 ```
 
-We have some count data
-
-We have corresponding weather data manually downloaded from the ISIP
-service
+Let us now create some toy count and weather data:
 
 ``` r
-file.name <- "20221215_isip_hourly_weather_data_export.xlsx"
-path <- system.file("extdata", file.name, package = "zeppr")
-daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)
-head(daily.table)
-#> # A tibble: 6 × 10
-#>   location date        Tmin  Tavg  Tmax humidity preci…¹ radia…² wind_…³ n_hours
-#>   <chr>    <date>     <dbl> <dbl> <dbl>    <dbl>   <dbl>   <dbl>   <dbl>   <int>
-#> 1 BWWR100  2022-01-01  4.86  9.37 14.1      91.0  0        51.8    0.774      24
-#> 2 BWWR100  2022-01-02  3.44  7.84 12.9      85.8  0        29.5    1.82       24
-#> 3 BWWR100  2022-01-03  9.39 11.2  13.1      76.1  0.0542   16.4    3.48       24
-#> 4 BWWR100  2022-01-04  4.51  8.51 11.9      94.8  1.52      6.33   2.86       24
-#> 5 BWWR100  2022-01-05  2.29  3.45  5.75     81.8  0        36.4    2.84       24
-#> 6 BWWR100  2022-01-06 -1.09  2.34  4.71     90.6  0        35.3    1.60       24
-#> # … with abbreviated variable names ¹​precipitation, ²​radiation, ³​wind_speed
+count.table <- data.frame(
+  Date=as.Date(c("2022-03-01", "2022-03-02", "2022-03-03", "2022-03-04", "2022-03-05")),
+  Count=c(0, 0, 10, 12, 2))
+
+weather.table <- data.frame(
+  Date=as.Date(c("2022-03-01", "2022-03-02", "2022-03-03", "2022-03-04", "2022-03-05")),
+  Tmin=c(4, 6, 11, 9, 10),
+  Tmax=c(12, 14, 13, 16, 14))
 ```
 
-## Functions
+We create the normalized cumulative sum of the counts as follows:
+
+``` r
+count.table$norm_cumsum <- normalized_cumsum(count.table$Count)
+head(count.table)
+#>         Date Count norm_cumsum
+#> 1 2022-03-01     0   0.0000000
+#> 2 2022-03-02     0   0.0000000
+#> 3 2022-03-03    10   0.4166667
+#> 4 2022-03-04    12   0.9166667
+#> 5 2022-03-05     2   1.0000000
+```
+
+We create the cumulative sum of growing degree-days (5°C\|30°C) as
+follows:
+
+``` r
+weather.table <- mutate_cumsum_gdd(weather.table, date=Date, t.min=Tmin, t.max=Tmax, 
+                  t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE)
+head(weather.table)
+#>         Date Tmin Tmax cumsum_gdd
+#> 1 2022-03-01    4   12        3.0
+#> 2 2022-03-02    6   14        8.0
+#> 3 2022-03-03   11   13       15.0
+#> 4 2022-03-04    9   16       22.5
+#> 5 2022-03-05   10   14       29.5
+```
+
+Finally we join the tables and plot:
+
+``` r
+count.table <- merge(count.table, weather.table[, c("Date", "cumsum_gdd")])
+plot(count.table$cumsum_gdd, count.table$norm_cumsum, type="o", 
+     xlab="cumulative sum of growing degree-days", ylab="normalized cumulative sum of counts")
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+
+## Simple documentation of the functions
+
+Extensive documentation is integrated in R help pages (e.g. type
+`?growing_degree_days` in the R console to get related help page)
 
 ### Normalized cumulative sum for vectors
 
@@ -73,8 +115,6 @@ normalized_cumsum(c(1,2,3,4,5))
 #> [1] 0.06666667 0.20000000 0.40000000 0.66666667 1.00000000
 ```
 
-mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
-
 ### Growing degree-days for vectors
 
 Function `growing_degree_days()` calculates the growing degree-days
@@ -82,7 +122,7 @@ independently for each pair of min and max day temperatures provided as
 2 vectors. Each pair represents implicitly a time point: either 1 day or
 1 hour, though no time data is required for the calculation here. The
 function is developed for daily data but can be used for hourly data
-with a few tricks explained below and automatized in function
+with a few tricks explained in annexes and automatized in function
 `mutate_cumsum_gdd()` described further below. Basic Formula: ((max
 temperature + min temperature)/2) - base temperature
 
@@ -101,31 +141,6 @@ growing_degree_days(t.min=9, t.max=20, t.ceiling=15, t.base=10, use.floor=TRUE)
 # Processes pairs of min max temperatures defined in 2 vectors of same length
 growing_degree_days(c(7, 8, 10), c(12, 14, 15), t.ceiling=30, t.base=10, use.floor=FALSE)
 #> [1] 0.0 1.0 2.5
-```
-
-#### Tricks for hourly data
-
-- Hourly data tables have 1 row per hour and thus 24 rows per day
-- Each hour has only 1 temperature (no min and max day temperatures)
-- Let us define growing degree-hours as the same as growing degree-days
-  but applied for a single hour where the min and max temperatures are
-  both equal to the temperature for this hour
-- Then, the degree-days for 1 day is equal to the sum of its 24
-  degree-hours divided by 24.
-
-The following tricks are automatized by the `mutate_cumsum_gdd()`
-function described further below.
-
-``` r
-# Let say we have 24 temperatures for a particular day
-temperatures = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
-# We can get corresponding degree-hours above 5 degrees
-gdh <- growing_degree_days(t.min=temperatures, t.max=temperatures, t.base=5)
-print(gdh)
-#>  [1] 0 0 0 0 0 1 2 3 4 5 6 7 6 5 4 3 2 1 0 0 0 0 0 0
-# the growing degree-days for this day is calculated as follows:
-sum(gdh)/24
-#> [1] 2.041667
 ```
 
 ### Cumulative sum of growing degree-days for data frames
@@ -306,4 +321,33 @@ mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE
 #> 4 BWWR100  2022-01-04  4.51  8.51 11.9       18.2 
 #> 5 BWWR100  2022-01-05  2.29  3.45  5.75      18.6 
 #> 6 BWWR100  2022-01-06 -1.09  2.34  4.71      18.6
+```
+
+## Annexes
+
+### Growing Degree-Days
+
+#### Tricks for hourly data
+
+- Hourly data tables have 1 row per hour and thus 24 rows per day
+- Each hour has only 1 temperature (no min and max day temperatures)
+- Let us define growing degree-hours as the same as growing degree-days
+  but applied for a single hour where the min and max temperatures are
+  both equal to the temperature for this hour
+- Then, the degree-days for 1 day is equal to the sum of its 24
+  degree-hours divided by 24.
+
+The following tricks are automatized by the `mutate_cumsum_gdd()`
+function described further below.
+
+``` r
+# Let say we have 24 temperatures for a particular day
+temperatures = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+# We can get corresponding degree-hours above 5 degrees
+gdh <- growing_degree_days(t.min=temperatures, t.max=temperatures, t.base=5)
+print(gdh)
+#>  [1] 0 0 0 0 0 1 2 3 4 5 6 7 6 5 4 3 2 1 0 0 0 0 0 0
+# the growing degree-days for this day is calculated as follows:
+sum(gdh)/24
+#> [1] 2.041667
 ```
