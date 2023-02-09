@@ -90,7 +90,7 @@ plot(data.table$cumsum_gdd,
 ```
 
 
-## Access doxumentation of the main functions from R
+## Access documentation of the main functions from R
 
 ```{r eval=FALSE}
 ?normalized_cumsum                   # normalized cumulative sum

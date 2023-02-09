@@ -96,7 +96,7 @@ plot(data.table$cumsum_gdd,
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
-## Access doxumentation of the main functions from R
+## Access documentation of the main functions from R
 
 ``` r
 ?normalized_cumsum                   # normalized cumulative sum
