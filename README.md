@@ -39,62 +39,72 @@ devtools::install_github("JFK24/zeppr")
 
 ## Simple use case
 
-We first load the package as follows:
+Let us create some toy count and weather data:
 
 ``` r
-library(zeppr)
-```
-
-Let us now create some toy count and weather data:
-
-``` r
-count.table <- data.frame(
+# Create a data frame
+data.table <- data.frame(
   Date=as.Date(c("2022-03-01", "2022-03-02", "2022-03-03", "2022-03-04", "2022-03-05")),
-  Count=c(0, 0, 10, 12, 2))
-
-weather.table <- data.frame(
-  Date=as.Date(c("2022-03-01", "2022-03-02", "2022-03-03", "2022-03-04", "2022-03-05")),
+  Count=c(0, 0, 10, 12, 2),
   Tmin=c(4, 6, 11, 9, 10),
-  Tmax=c(12, 14, 13, 16, 14))
+  Tmax=c(12, 14, 13, 16, 14)
+  )
+# Show top of the data frame
+head(data.table)
+#>         Date Count Tmin Tmax
+#> 1 2022-03-01     0    4   12
+#> 2 2022-03-02     0    6   14
+#> 3 2022-03-03    10   11   13
+#> 4 2022-03-04    12    9   16
+#> 5 2022-03-05     2   10   14
 ```
 
-We create the normalized cumulative sum of the counts as follows:
-
-``` r
-count.table$norm_cumsum <- normalized_cumsum(count.table$Count)
-head(count.table)
-#>         Date Count norm_cumsum
-#> 1 2022-03-01     0   0.0000000
-#> 2 2022-03-02     0   0.0000000
-#> 3 2022-03-03    10   0.4166667
-#> 4 2022-03-04    12   0.9166667
-#> 5 2022-03-05     2   1.0000000
-```
-
-We create the cumulative sum of growing degree-days (5°C\|30°C) as
+Thanks to `zeppr`, we create easily the normalized cumulative sum of the
+counts and the cumulative sum of growing degree-days (5°C\|30°C) as
 follows:
 
 ``` r
-weather.table <- mutate_cumsum_gdd(weather.table, date=Date, t.min=Tmin, t.max=Tmax, 
-                  t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE)
-head(weather.table)
-#>         Date Tmin Tmax cumsum_gdd
-#> 1 2022-03-01    4   12        3.0
-#> 2 2022-03-02    6   14        8.0
-#> 3 2022-03-03   11   13       15.0
-#> 4 2022-03-04    9   16       22.5
-#> 5 2022-03-05   10   14       29.5
+# Load package
+library(zeppr)
+# normalized cumulative sum of the counts
+data.table$norm_cumsum <- normalized_cumsum(data.table$Count)
+# cumulative sum of growing degree-days (5°C|30°C)
+data.table <- mutate_cumsum_gdd(
+  data.table, date=Date, t.min=Tmin, t.max=Tmax, 
+  t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE)
+# Show top of the data frame
+head(data.table)
+#>         Date Count Tmin Tmax norm_cumsum cumsum_gdd
+#> 1 2022-03-01     0    4   12   0.0000000        3.0
+#> 2 2022-03-02     0    6   14   0.0000000        8.0
+#> 3 2022-03-03    10   11   13   0.4166667       15.0
+#> 4 2022-03-04    12    9   16   0.9166667       22.5
+#> 5 2022-03-05     2   10   14   1.0000000       29.5
 ```
 
-Finally we join the tables and plot:
+Finally we can plot the new values with some plotting functions (not
+from `zeppr`):
 
 ``` r
-count.table <- merge(count.table, weather.table[, c("Date", "cumsum_gdd")])
-plot(count.table$cumsum_gdd, count.table$norm_cumsum, type="o", 
-     xlab="cumulative sum of growing degree-days", ylab="normalized cumulative sum of counts")
+# Plot with the standard plotting functions
+plot(data.table$cumsum_gdd, 
+     data.table$norm_cumsum, 
+     type="o", 
+     xlab="cumulative sum of growing degree-days", 
+     ylab="normalized cumulative sum of counts")
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+
+## Access doxumentation of the main functions from R
+
+``` r
+?normalized_cumsum                   # normalized cumulative sum
+?growing_degree_days                 # growing degree days for 1 day
+?mutate_cumsum_gdd                   # cumulative sum of growing degree-days
+?read_isip_hourly_weather_data       # reads weather data from an ISIP Excel file
+?mutate_isip_weather_with_cumsum_gdd # cumulative sum of growing degree-days for ISIP weather data
+```
 
 ## Simple documentation of the functions
 
@@ -327,7 +337,7 @@ mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE
 
 ### Growing Degree-Days
 
-#### Tricks for hourly data
+#### Use the growing degree days daily-data formula to process hourly data
 
 - Hourly data tables have 1 row per hour and thus 24 rows per day
 - Each hour has only 1 temperature (no min and max day temperatures)
