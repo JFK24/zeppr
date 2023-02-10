@@ -3,3 +3,4 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
+^inst/extdata/stundenwerte_ST_00183_row.zip$

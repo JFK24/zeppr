@@ -99,11 +99,18 @@ plot(data.table$cumsum_gdd,
 ## Access documentation of the main functions from R
 
 ``` r
+# Already in the latest release
 ?normalized_cumsum                   # normalized cumulative sum
 ?growing_degree_days                 # growing degree days for 1 day
 ?mutate_cumsum_gdd                   # cumulative sum of growing degree-days
 ?read_isip_hourly_weather_data       # reads weather data from an ISIP Excel file
 ?mutate_isip_weather_with_cumsum_gdd # cumulative sum of growing degree-days for ISIP weather data
+
+# In development
+?get_dwd_stations_info
+?dist_on_earth
+?closer_dwd_station
+?get_dwd_station_data
 ```
 
 ## Simple documentation of the functions

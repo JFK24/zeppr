@@ -4,12 +4,14 @@
 \alias{dwd_category_code}
 \title{Get DWD Category Code}
 \usage{
-dwd_category_code(category)
+dwd_category_code(category, lower_case = FALSE)
 }
 \arguments{
 \item{category}{(chr) choices: air_temperature, cloud_type, cloudiness,
 dew_point, extreme_wind, moisture, precipitation, pressure, soil_temperature,
 solar, sun, visibility, weather_phenomena, wind, wind_synop}
+
+\item{lower_case}{(boolean) output lowercase code if TRUE, upper case otherwise}
 }
 \value{
 (chr) code corresponding to the supported categories, NA otherwise
@@ -20,5 +22,5 @@ and TD for dew_point).
 }
 \examples{
 dwd_category_code("air_temperature")
-dwd_category_code("dew_point")
+dwd_category_code("air_temperature", lower_case=TRUE)
 }

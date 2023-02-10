@@ -12,8 +12,8 @@ read_dwd_stations_info_file(path)
 }
 \value{
 (data.frame) data frame of the stations info with the following
-columns: station_id, start_date, end_date, altitude, latitude,
-longitude, station_name, bundesland
+columns: station_id (chr), start_date (date), end_date (date), altitude (dbl),
+latitude (dbl), longitude (dbl), station_name (chr), bundesland (chr)
 }
 \description{
 Reads a local file describing DWD stations downloaded from a subfolder of

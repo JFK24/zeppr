@@ -14,7 +14,10 @@ soil_temperature, solar, sun, visibility, weather_phenomena, wind, wind_synop}
 \item{timerange}{(char) equal to "recent" (historical not supported)}
 }
 \value{
-(data.frame) data frame of the stations info
+(data.frame) data frame of the stations info with the following
+columns: station_id (chr), start_date (date), end_date (date), altitude (dbl),
+latitude (dbl), longitude (dbl), station_name (chr), bundesland (chr),
+metrics (chr)
 }
 \description{
 Download stations info file from DWD recent data (not historical) for a

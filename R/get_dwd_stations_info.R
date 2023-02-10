@@ -7,31 +7,33 @@
 #' @param category (chr) choices: air_temperature, cloud_type, cloudiness,
 #' dew_point, extreme_wind, moisture, precipitation, pressure, soil_temperature,
 #' solar, sun, visibility, weather_phenomena, wind, wind_synop
+#' @param lower_case (boolean) output lowercase code if TRUE, upper case otherwise
 #' @return (chr) code corresponding to the supported categories, NA otherwise
 #' @examples
 #' dwd_category_code("air_temperature")
-#' dwd_category_code("dew_point")
+#' dwd_category_code("air_temperature", lower_case=TRUE)
 #' @export
 # ==============================================================================
-dwd_category_code <- function(category){
-  if(category=="air_temperature"){return("TU")}
-  if(category=="cloud_type"){return("CS")}
-  if(category=="cloudiness"){return("N")}
-  if(category=="dew_point"){return("TD")}
-  if(category=="extreme_wind"){return("FX")}
-  if(category=="moisture"){return("TF")}
-  if(category=="precipitation"){return("RR")}
-  if(category=="pressure"){return("P0")}
-  if(category=="soil_temperature"){return("EB")}
-  if(category=="solar"){return("ST")} # no "recent" subdir !
-  if(category=="sun"){return("SD")}
-  if(category=="visibility"){return("VV")}
-  if(category=="weather_phenomena"){return("WW")}
-  if(category=="wind"){return("FF")}
-  if(category=="wind_synop"){return("F")}
-  return("NA")
+dwd_category_code <- function(category, lower_case=FALSE){
+  code <- NA
+  if(category=="air_temperature"){code <- "TU"} else
+    if(category=="cloud_type"){code <- "CS"} else
+      if(category=="cloudiness"){code <- "N"} else
+        if(category=="dew_point"){code <- "TD"} else
+          if(category=="extreme_wind"){code <- "FX"} else
+            if(category=="moisture"){code <- "TF"} else
+              if(category=="precipitation"){code <- "RR"} else
+                if(category=="pressure"){code <- "P0"} else
+                  if(category=="soil_temperature"){code <- "EB"} else
+                    if(category=="solar"){code <- "ST"} else # no "recent" subdir !
+                      if(category=="sun"){code <- "SD"} else
+                        if(category=="visibility"){code <- "VV"} else
+                          if(category=="weather_phenomena"){code <- "WW"} else
+                            if(category=="wind"){code <- "FF"} else
+                              if(category=="wind_synop"){code <- "F"}
+  if(!is.na(code) & lower_case){code=tolower(code)}
+  return(code)
 }
-
 
 # ==============================================================================
 #' Read DWD Stations Info File
@@ -43,8 +45,8 @@ dwd_category_code <- function(category){
 #' @param path (chr) file path to a DWD Stations Info file such as
 #' "TU_Stundenwerte_Beschreibung_Stationen.txt"
 #' @return (data.frame) data frame of the stations info with the following
-#' columns: station_id, start_date, end_date, altitude, latitude,
-#' longitude, station_name, bundesland
+#' columns: station_id (chr), start_date (date), end_date (date), altitude (dbl),
+#' latitude (dbl), longitude (dbl), station_name (chr), bundesland (chr)
 #' @examples
 #' # Read an example Stations Info file for Air Temperature
 #' file.name.1 <- "TU_Stundenwerte_Beschreibung_Stationen.txt"
@@ -87,7 +89,10 @@ read_dwd_stations_info_file <- function(path){
 #' cloudiness, dew_point, extreme_wind, moisture, precipitation, pressure,
 #' soil_temperature, solar, sun, visibility, weather_phenomena, wind, wind_synop
 #' @param timerange (char) equal to "recent" (historical not supported)
-#' @return (data.frame) data frame of the stations info
+#' @return (data.frame) data frame of the stations info with the following
+#' columns: station_id (chr), start_date (date), end_date (date), altitude (dbl),
+#' latitude (dbl), longitude (dbl), station_name (chr), bundesland (chr),
+#' metrics (chr)
 #' @examples
 #' get_dwd_stations_info("air_temperature")
 #' get_dwd_stations_info("dew_point")
