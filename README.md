@@ -37,7 +37,9 @@ follows to get potential new features but also new potential new bugs:
 devtools::install_github("JFK24/zeppr")
 ```
 
-## Simple use case
+## Simple use cases
+
+### Use case 1
 
 Let us create some toy count and weather data:
 
@@ -95,6 +97,68 @@ plot(data.table$cumsum_gdd,
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+
+### Use case 2
+
+Let us create some toy locations and corresponding geographic
+coordinates:
+
+``` r
+# Create a data frame
+locations <- data.frame(
+  loc=c("A", "B", "C"),
+  lat=c(49, 50, 52.52),
+  lon=c(8, 9, 13.41)
+)
+# Show top of the data frame
+head(locations)
+#>   loc   lat   lon
+#> 1   A 49.00  8.00
+#> 2   B 50.00  9.00
+#> 3   C 52.52 13.41
+```
+
+Thanks to `zeppr`, we retrieve the closest weather station from DWD
+weather service and find the closest station to some input coordinates
+as follows:
+
+``` r
+# Load package
+library(zeppr)
+stations.info <- get_dwd_stations_info("air_temperature", timerange="historical")
+id <- closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="id")
+km <- closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="dist")
+print(id) # station id
+print(km) # distance to station in km
+```
+
+We can process the locations table as follows:
+
+``` r
+# With base R
+locations$station.id <- closer_dwd_station(locations$lat, locations$lon, 
+  stations_table=stations.info, return_string = "id")
+locations$station.name <- closer_dwd_station(locations$lat, locations$lon, 
+  stations_table=stations.info, return_string = "name")
+head(locations)
+
+# With dplyr abd pipes from magrittr (%>%):
+library(magrittr)
+locations %>% 
+  mutate(station.id=closer_dwd_station(
+    lat, lon, stations_table=stations.info)) %>% 
+  mutate(station.name=closer_dwd_station(
+    lat, lon, stations_table=stations.info, return_string = "name")) %>% 
+  mutate(station.distance=closer_dwd_station(
+    lat, lon, stations_table=stations.info, return_string = "dist"))
+```
+
+Finally, we can get the weather data from a given station as follows:
+
+``` r
+station.data <- get_dwd_station_data(station_id="00044", category="air_temperature")
+head(station.data)
+```
 
 ## Access documentation of the main functions from R
 

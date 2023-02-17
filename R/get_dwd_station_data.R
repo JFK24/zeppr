@@ -3,13 +3,16 @@
 #'
 #' Reads a local file containing DWD station data extracted from a zip file
 #' downloaded from a subfolder of the following URL
-#' https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/
+#' https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/.
+#' Recent and historical data are supported.
+#' For example, the recent station data file related to air temperature will be found
+#' from the URL above at air_temperature/recent/stundenwerte_TU_00044_akt.zip
 #'
-#' @param station_zip_path (chr) file path to a DWD Station Data zip file
+#' @param station_zip_path (`chr`) local file path to a DWD Station Data zip file
 #' such as "stundenwerte_TU_00044_akt.zip"
-#' @return (data.frame) data frame of the station data with the following
+#' @return (`data.frame`) data frame of the station data with the following
 #' columns: station_id, timestamp, and a variable number of columns depending on
-#' the file. All columns are of type chr except timestamp of type POSIXct.
+#' the file. All columns are of type `chr` except timestamp of type `POSIXct`.
 #' @examples
 #' # Read an example Station Data file for Air Temperature
 #' file.name.1 <- "stundenwerte_TU_00044_akt.zip"
@@ -19,6 +22,10 @@
 #' file.name.2 <- "stundenwerte_TF_00044_akt.zip"
 #' path.2 <- system.file("extdata", file.name.2, package = "zeppr")
 #' head(read_dwd_station_data_file(path.2))
+#' # Read an example historical Station Data file for Air Temperature
+#' file.name.3 <- "stundenwerte_TU_00044_20070401_20211231_hist.zip"
+#' path.3 <- system.file("extdata", file.name.3, package = "zeppr")
+#' head(read_dwd_station_data_file(path.3))
 #' @export
 # ==============================================================================
 read_dwd_station_data_file <- function(station_zip_path){
@@ -68,19 +75,20 @@ read_dwd_station_data_file <- function(station_zip_path){
       encoding = "latin1",
       stringsAsFactors=FALSE,
       colClasses = "character"
-    )    %>%
+    ) %>%
     dplyr::mutate(MESS_DATUM=as.POSIXct(.data$MESS_DATUM, format="%Y%m%d%H")) %>%
     dplyr::mutate(STATIONS_ID = sprintf("%05i", as.numeric(.data$STATIONS_ID))) %>%
     dplyr::rename(station_id="STATIONS_ID") %>%
     dplyr::rename(timestamp="MESS_DATUM") %>%
     dplyr::select(-"eor") %>%
-    dplyr::select(-tidyselect::starts_with("QN"))
+    dplyr::select(-tidyselect::starts_with("QN")) %>%
+    dplyr::mutate_at(stations_metadata$Parameter, trimws) %>%
+    dplyr::mutate_at(stations_metadata$Parameter, function(x) ifelse(x=="-999", NA, x) )
 
   setdiff_res <- setdiff(names(stations_data), stations_metadata$Parameter)
   map <- stats::setNames(c(setdiff_res, stations_metadata$Parameterbeschreibung),
                  c(setdiff_res, stations_metadata$Parameter))
   names(stations_data) <- as.vector(map[names(stations_data)])
-
   return(stations_data)
 }
 
@@ -124,47 +132,55 @@ read_dwd_station_data_file <- function(station_zip_path){
 # ==============================================================================
 #' Get DWD Station Data from Internet
 #'
-#' Download station data file from DWD recent data (not historical) for a
-#' requested metrics category (e.g. air_temperature or dew_point).
-#' List of categories
-#' https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/
+#' Retrieve data of a weather station of the German Weather Service (DWD)
+#' from its FTP site for a requested metrics category
+#' (e.g. air_temperature or dew_point). The original data file is not saved
+#' locally.
 #'
-#' @param station_id (char) DWD station ID as 5-character string e.g. "00044"
-#' @param category (char) a metrics category from: air_temperature, cloud_type,
+#' @param station_id (`chr`) DWD station ID as 5-character string e.g. "00044"
+#' @param category (`chr`) a metrics category from: air_temperature, cloud_type,
 #' cloudiness, dew_point, extreme_wind, moisture, precipitation, pressure,
 #' soil_temperature, solar, sun, visibility, weather_phenomena, wind, wind_synop
-#' @param timerange (char) equal to "recent" (historical not supported)
-#' @return (data.frame) data frame of the stations data or NA if download
+#' @param timerange (`chr`) either "recent" or "historical"
+#' @return (`data.frame`) data frame of the stations data or `NA` if download
 #' failed. The data frame has the following columns: station_id, timestamp,
 #' and a variable number of columns depending on the file.
-#' All columns are of type chr except timestamp of type POSIXct.
+#' All columns are of type chr except timestamp of type `POSIXct`.
 #' @examples
 #' head(get_dwd_station_data(station_id="00044", category="air_temperature"))
-#' head(get_dwd_station_data(station_id="00044", category="dew_point"))
 #' head(get_dwd_station_data(station_id="00183", category="solar"))
+#' head(get_dwd_station_data(station_id="00044", category="dew_point", timerange="historical"))
 #' @export
 # ==============================================================================
 get_dwd_station_data <- function(station_id="00044", category="air_temperature", timerange="recent"){
   # category="air_temperature"
-  # station_id="00044v"
-  timerange="recent"
+  # station_id="00044"
+  # timerange="recent"
+  # timerange="historical"
+  # category="solar"
+  # station_id="00183"
   code <- dwd_category_code(category)
   if(is.na(code)){
     message("get_dwd_station_data(): unsupported category!")
     message(paste("parametrers: ", station_id, category))
     return(NA)
   }
-  stations_data_url <- "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly"
-  stations_data_url <- paste(stations_data_url, category, timerange, sep="/")
-  stations_data_url <- paste0(stations_data_url, "/stundenwerte_", code, "_", station_id, "_akt.zip")
-  if(category=="solar"){
-    stations_data_url <- "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly"
-    stations_data_url <- paste(stations_data_url, category, sep="/")
-    stations_data_url <- paste0(stations_data_url, "/stundenwerte_", code, "_", station_id, "_row.zip")
-  }
+  suffix <- ifelse(timerange=="recent", "akt", "hist")
+
+  station_data_url <- "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly"
+  station_data_url <- ifelse(
+    category=="solar",
+    paste(station_data_url, category, sep="/"),
+    paste(station_data_url, category, timerange, sep="/")
+  )
+  web.page <- RCurl::getURL(paste0(station_data_url, "/"),verbose=F)
+  ftp.files <- XML::getHTMLLinks(web.page)
+  station.file.name <- grep(paste(code, station_id, sep="_"), ftp.files, value = T)[1]
+  station_data_url <- paste0(station_data_url, "/", station.file.name)
+
   stations_data_file <- tempfile()
   out <- tryCatch(
-    expr={utils::download.file(stations_data_url, stations_data_file, quiet = TRUE)},
+    expr={utils::download.file(station_data_url, stations_data_file, quiet = TRUE)},
     error=function(e) {
       download_success <- FALSE
       message("get_dwd_station_data(): download failed!")
@@ -179,7 +195,6 @@ get_dwd_station_data <- function(station_id="00044", category="air_temperature",
       return(NA)
     }
     )
-  # utils::download.file(stations_data_url, stations_data_file, quiet = TRUE)
   if(is.na(out)) {return(NA)}
   stations_data_table <- read_dwd_station_data_file(stations_data_file)
   unlink(stations_data_file)

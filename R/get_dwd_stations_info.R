@@ -1,18 +1,19 @@
 # ==============================================================================
 #' Get DWD Category Code
 #'
-#' Returns 1-2 letter code for a metrics category (e.g. TU for air_temperature,
-#' and TD for dew_point).
+#' Returns 1-2 letter code for a given metrics category defined on the German
+#' Weather service (DWD) FTP site (e.g. TU for air_temperature, and TD
+#' for dew_point).
 #'
-#' @param category (chr) choices: air_temperature, cloud_type, cloudiness,
-#' dew_point, extreme_wind, moisture, precipitation, pressure, soil_temperature,
-#' solar, sun, visibility, weather_phenomena, wind, wind_synop
-#' @param lower_case (boolean) output lowercase code if TRUE, upper case otherwise
-#' @return (chr) code corresponding to the supported categories, NA otherwise
+#' @param category (`chr`) one of the following category: air_temperature,
+#' cloud_type, cloudiness, dew_point, extreme_wind, moisture, precipitation,
+#' pressure, soil_temperature, solar, sun, visibility, weather_phenomena,
+#' wind, wind_synop
+#' @param lower_case (`boolean`) output lowercase code if `TRUE`, upper case otherwise
+#' @return (`chr`) code corresponding to the supported categories, `NA` otherwise
 #' @examples
-#' dwd_category_code("air_temperature")
-#' dwd_category_code("air_temperature", lower_case=TRUE)
-#' @export
+#' # zeppr:::dwd_category_code("air_temperature")
+#' # zeppr:::dwd_category_code("air_temperature", lower_case=TRUE)
 # ==============================================================================
 dwd_category_code <- function(category, lower_case=FALSE){
   code <- NA
@@ -35,18 +36,23 @@ dwd_category_code <- function(category, lower_case=FALSE){
   return(code)
 }
 
+
 # ==============================================================================
 #' Read DWD Stations Info File
 #'
-#' Reads a local file describing DWD stations downloaded from a subfolder of
-#' the following URL
-#' https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/
+#' Reads a local file describing weather stations of the German Weather
+#' Service (DWD). The latest daily update of this file is available to download
+#' from a subfolder of the following URL:
+#' https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/.
+#' For example, the stations info file related to air temperature will be found
+#' from the URL above at air_temperature/recent/TU_Stundenwerte_Beschreibung_Stationen.txt
 #'
-#' @param path (chr) file path to a DWD Stations Info file such as
+#' @param path (`chr`) local file path to a DWD Stations Info file such as
 #' "TU_Stundenwerte_Beschreibung_Stationen.txt"
-#' @return (data.frame) data frame of the stations info with the following
-#' columns: station_id (chr), start_date (date), end_date (date), altitude (dbl),
-#' latitude (dbl), longitude (dbl), station_name (chr), bundesland (chr)
+#' @return (`data.frame`) data frame of the stations info with the following
+#' columns: station_id (`chr`), start_date (`date`), end_date (`date`),
+#' altitude (`dbl`), latitude (`dbl`), longitude (`dbl`), station_name (`chr`),
+#' bundesland (`chr`)
 #' @examples
 #' # Read an example Stations Info file for Air Temperature
 #' file.name.1 <- "TU_Stundenwerte_Beschreibung_Stationen.txt"
@@ -80,30 +86,37 @@ read_dwd_stations_info_file <- function(path){
 # ==============================================================================
 #' Get DWD Stations Info from Internet
 #'
-#' Download stations info file from DWD recent data (not historical) for a
-#' requested metrics category (e.g. air_temperature or dew_point).
-#' List of categories
-#' https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/
+#' Retrieve information on weather stations of the German Weather Service (DWD)
+#' from its FTP site for a requested metrics category
+#' (e.g. air_temperature or dew_point). The original data file is not saved
+#' locally.
 #'
-#' @param category (char) a metrics category from: air_temperature, cloud_type,
-#' cloudiness, dew_point, extreme_wind, moisture, precipitation, pressure,
-#' soil_temperature, solar, sun, visibility, weather_phenomena, wind, wind_synop
-#' @param timerange (char) equal to "recent" (historical not supported)
+#' @param category (`chr`) one of the following metrics category: air_temperature,
+#' cloud_type, cloudiness, dew_point, extreme_wind, moisture, precipitation,
+#' pressure, soil_temperature, solar, sun, visibility, weather_phenomena,
+#' wind, wind_synop
+#' @param timerange (`chr`) equal to either "recent" or "historical"
 #' @return (data.frame) data frame of the stations info with the following
-#' columns: station_id (chr), start_date (date), end_date (date), altitude (dbl),
-#' latitude (dbl), longitude (dbl), station_name (chr), bundesland (chr),
-#' metrics (chr)
+#' columns: station_id (`chr`), start_date (`date`), end_date (`date`),
+#' altitude (`dbl`), latitude (`dbl`), longitude (`dbl`), station_name (`chr`),
+#' bundesland (`chr`), metrics (`chr`)
 #' @examples
 #' get_dwd_stations_info("air_temperature")
 #' get_dwd_stations_info("dew_point")
+#' get_dwd_stations_info("solar")
+#' get_dwd_stations_info("air_temperature", timerange="historical")
 #' @export
 # ==============================================================================
 get_dwd_stations_info <- function(category="air_temperature", timerange="recent"){
   # category="air_temperature"
-  timerange="recent"
+  # timerange="recent"
   code <- dwd_category_code(category)
   stations_info_url <- "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly"
-  stations_info_url <- paste(stations_info_url, category, timerange, sep="/")
+  stations_info_url <- ifelse(
+    category=="solar",
+    paste(stations_info_url, category, sep="/"),
+    paste(stations_info_url, category, timerange, sep="/")
+  )
   stations_info_url <- paste0(stations_info_url, "/", code, "_Stundenwerte_Beschreibung_Stationen.txt")
   stations_info_file <- tempfile()
   utils::download.file(stations_info_url, stations_info_file)

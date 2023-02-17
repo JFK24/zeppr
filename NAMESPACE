@@ -2,7 +2,6 @@
 
 export(closer_dwd_station)
 export(dist_on_earth)
-export(dwd_category_code)
 export(get_dwd_station_data)
 export(get_dwd_stations_info)
 export(growing_degree_days)

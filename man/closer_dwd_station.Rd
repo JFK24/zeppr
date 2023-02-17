@@ -2,7 +2,7 @@
 % Please edit documentation in R/closer_dwd_station.R
 \name{closer_dwd_station}
 \alias{closer_dwd_station}
-\title{Information on closer DWD station}
+\title{Information on closer DWD weather station}
 \usage{
 closer_dwd_station(
   lat,
@@ -23,24 +23,33 @@ closer_dwd_station(
 \item{end_date}{(chr) stations must have data until this date or later (e.g. 2023-01-30)}
 
 \item{stations_table}{(data.frame) table of stations info as provided by
-functions \code{get_dwd_stations_info()} or \code{read_dwd_stations_info_file()}}
+functions \code{\link[=get_dwd_stations_info]{get_dwd_stations_info()}} or \code{\link[=read_dwd_stations_info_file]{read_dwd_stations_info_file()}}}
 
 \item{return_string}{(chr) will return station id if set to "id",
-name if set to "name", a string with all info separated by commas otherwise}
+name if set to "name", distance in km if set to "dist",
+a string with all info separated by commas otherwise}
 }
 \value{
-(chr) information about the station (see parameter return_string)
+(chr) information about the station (see parameter \code{return_string})
 }
 \description{
-Identify the closest DWD station from a given point on earth and return
-selected information about the station.
+Identify the closest weather station of the German Weather Service (DWD)
+from a given point on earth and return selected information about the
+stations.
 }
 \examples{
 # Read an example Stations Info file for Air Temperature
 file.name.1 <- "TU_Stundenwerte_Beschreibung_Stationen.txt"
 path.1 <- system.file("extdata", file.name.1, package = "zeppr")
 my.stations <- read_dwd_stations_info_file(path.1)
+# Some examples
 closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations)
 closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations, return_string = "name")
+closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations, return_string = "dist")
 closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations, return_string = "all")
+# given a simple data.frame with 3 pairs of geographic coordinates
+loc <- data.frame(lat=c(49, 50, 52.52), lon=c(8, 9, 13.41))
+# we add a column containing for each pair the id of the closest station as follows:
+loc$station.id <- closer_dwd_station(loc$lat, loc$lon, stations_table=my.stations)
+head(loc)
 }

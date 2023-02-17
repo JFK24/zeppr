@@ -7,18 +7,22 @@
 read_dwd_stations_info_file(path)
 }
 \arguments{
-\item{path}{(chr) file path to a DWD Stations Info file such as
+\item{path}{(\code{chr}) local file path to a DWD Stations Info file such as
 "TU_Stundenwerte_Beschreibung_Stationen.txt"}
 }
 \value{
-(data.frame) data frame of the stations info with the following
-columns: station_id (chr), start_date (date), end_date (date), altitude (dbl),
-latitude (dbl), longitude (dbl), station_name (chr), bundesland (chr)
+(\code{data.frame}) data frame of the stations info with the following
+columns: station_id (\code{chr}), start_date (\code{date}), end_date (\code{date}),
+altitude (\code{dbl}), latitude (\code{dbl}), longitude (\code{dbl}), station_name (\code{chr}),
+bundesland (\code{chr})
 }
 \description{
-Reads a local file describing DWD stations downloaded from a subfolder of
-the following URL
-https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/
+Reads a local file describing weather stations of the German Weather
+Service (DWD). The latest daily update of this file is available to download
+from a subfolder of the following URL:
+https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/.
+For example, the stations info file related to air temperature will be found
+from the URL above at air_temperature/recent/TU_Stundenwerte_Beschreibung_Stationen.txt
 }
 \examples{
 # Read an example Stations Info file for Air Temperature

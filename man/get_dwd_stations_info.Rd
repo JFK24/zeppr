@@ -7,25 +7,28 @@
 get_dwd_stations_info(category = "air_temperature", timerange = "recent")
 }
 \arguments{
-\item{category}{(char) a metrics category from: air_temperature, cloud_type,
-cloudiness, dew_point, extreme_wind, moisture, precipitation, pressure,
-soil_temperature, solar, sun, visibility, weather_phenomena, wind, wind_synop}
+\item{category}{(\code{chr}) one of the following metrics category: air_temperature,
+cloud_type, cloudiness, dew_point, extreme_wind, moisture, precipitation,
+pressure, soil_temperature, solar, sun, visibility, weather_phenomena,
+wind, wind_synop}
 
-\item{timerange}{(char) equal to "recent" (historical not supported)}
+\item{timerange}{(\code{chr}) equal to either "recent" or "historical"}
 }
 \value{
 (data.frame) data frame of the stations info with the following
-columns: station_id (chr), start_date (date), end_date (date), altitude (dbl),
-latitude (dbl), longitude (dbl), station_name (chr), bundesland (chr),
-metrics (chr)
+columns: station_id (\code{chr}), start_date (\code{date}), end_date (\code{date}),
+altitude (\code{dbl}), latitude (\code{dbl}), longitude (\code{dbl}), station_name (\code{chr}),
+bundesland (\code{chr}), metrics (\code{chr})
 }
 \description{
-Download stations info file from DWD recent data (not historical) for a
-requested metrics category (e.g. air_temperature or dew_point).
-List of categories
-https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/
+Retrieve information on weather stations of the German Weather Service (DWD)
+from its FTP site for a requested metrics category
+(e.g. air_temperature or dew_point). The original data file is not saved
+locally.
 }
 \examples{
 get_dwd_stations_info("air_temperature")
 get_dwd_stations_info("dew_point")
+get_dwd_stations_info("solar")
+get_dwd_stations_info("air_temperature", timerange="historical")
 }

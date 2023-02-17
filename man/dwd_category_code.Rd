@@ -7,20 +7,22 @@
 dwd_category_code(category, lower_case = FALSE)
 }
 \arguments{
-\item{category}{(chr) choices: air_temperature, cloud_type, cloudiness,
-dew_point, extreme_wind, moisture, precipitation, pressure, soil_temperature,
-solar, sun, visibility, weather_phenomena, wind, wind_synop}
+\item{category}{(\code{chr}) one of the following category: air_temperature,
+cloud_type, cloudiness, dew_point, extreme_wind, moisture, precipitation,
+pressure, soil_temperature, solar, sun, visibility, weather_phenomena,
+wind, wind_synop}
 
-\item{lower_case}{(boolean) output lowercase code if TRUE, upper case otherwise}
+\item{lower_case}{(\code{boolean}) output lowercase code if \code{TRUE}, upper case otherwise}
 }
 \value{
-(chr) code corresponding to the supported categories, NA otherwise
+(\code{chr}) code corresponding to the supported categories, \code{NA} otherwise
 }
 \description{
-Returns 1-2 letter code for a metrics category (e.g. TU for air_temperature,
-and TD for dew_point).
+Returns 1-2 letter code for a given metrics category defined on the German
+Weather service (DWD) FTP site (e.g. TU for air_temperature, and TD
+for dew_point).
 }
 \examples{
-dwd_category_code("air_temperature")
-dwd_category_code("air_temperature", lower_case=TRUE)
+# zeppr:::dwd_category_code("air_temperature")
+# zeppr:::dwd_category_code("air_temperature", lower_case=TRUE)
 }

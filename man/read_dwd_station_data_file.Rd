@@ -7,18 +7,21 @@
 read_dwd_station_data_file(station_zip_path)
 }
 \arguments{
-\item{station_zip_path}{(chr) file path to a DWD Station Data zip file
+\item{station_zip_path}{(\code{chr}) local file path to a DWD Station Data zip file
 such as "stundenwerte_TU_00044_akt.zip"}
 }
 \value{
-(data.frame) data frame of the station data with the following
+(\code{data.frame}) data frame of the station data with the following
 columns: station_id, timestamp, and a variable number of columns depending on
-the file. All columns are of type chr except timestamp of type POSIXct.
+the file. All columns are of type \code{chr} except timestamp of type \code{POSIXct}.
 }
 \description{
 Reads a local file containing DWD station data extracted from a zip file
 downloaded from a subfolder of the following URL
-https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/
+https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/.
+Recent and historical data are supported.
+For example, the recent station data file related to air temperature will be found
+from the URL above at air_temperature/recent/stundenwerte_TU_00044_akt.zip
 }
 \examples{
 # Read an example Station Data file for Air Temperature
@@ -29,4 +32,8 @@ head(read_dwd_station_data_file(path.1))
 file.name.2 <- "stundenwerte_TF_00044_akt.zip"
 path.2 <- system.file("extdata", file.name.2, package = "zeppr")
 head(read_dwd_station_data_file(path.2))
+# Read an example historical Station Data file for Air Temperature
+file.name.3 <- "stundenwerte_TU_00044_20070401_20211231_hist.zip"
+path.3 <- system.file("extdata", file.name.3, package = "zeppr")
+head(read_dwd_station_data_file(path.3))
 }

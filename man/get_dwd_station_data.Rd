@@ -11,28 +11,28 @@ get_dwd_station_data(
 )
 }
 \arguments{
-\item{station_id}{(char) DWD station ID as 5-character string e.g. "00044"}
+\item{station_id}{(\code{chr}) DWD station ID as 5-character string e.g. "00044"}
 
-\item{category}{(char) a metrics category from: air_temperature, cloud_type,
+\item{category}{(\code{chr}) a metrics category from: air_temperature, cloud_type,
 cloudiness, dew_point, extreme_wind, moisture, precipitation, pressure,
 soil_temperature, solar, sun, visibility, weather_phenomena, wind, wind_synop}
 
-\item{timerange}{(char) equal to "recent" (historical not supported)}
+\item{timerange}{(\code{chr}) either "recent" or "historical"}
 }
 \value{
-(data.frame) data frame of the stations data or NA if download
+(\code{data.frame}) data frame of the stations data or \code{NA} if download
 failed. The data frame has the following columns: station_id, timestamp,
 and a variable number of columns depending on the file.
-All columns are of type chr except timestamp of type POSIXct.
+All columns are of type chr except timestamp of type \code{POSIXct}.
 }
 \description{
-Download station data file from DWD recent data (not historical) for a
-requested metrics category (e.g. air_temperature or dew_point).
-List of categories
-https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/
+Retrieve data of a weather station of the German Weather Service (DWD)
+from its FTP site for a requested metrics category
+(e.g. air_temperature or dew_point). The original data file is not saved
+locally.
 }
 \examples{
 head(get_dwd_station_data(station_id="00044", category="air_temperature"))
-head(get_dwd_station_data(station_id="00044", category="dew_point"))
 head(get_dwd_station_data(station_id="00183", category="solar"))
+head(get_dwd_station_data(station_id="00044", category="dew_point", timerange="historical"))
 }
