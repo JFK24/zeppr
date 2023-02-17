@@ -109,7 +109,7 @@ Thanks to `zeppr`, we retrieve information on weather stations from DWD
 weather service offering data on air temperature as follows:
 
 ``` r
-stations.info <- get_dwd_stations_info("air_temperature", timerange="historical")
+stations.info <- get_dwd_stations_info("air_temperature", timerange="recent")
 ```
 
 ``` r
@@ -126,15 +126,17 @@ head(stations.info)
 #> # … with abbreviated variable names ¹​station_name, ²​bundesland
 ```
 
-We can search the id and distance of the closest station for given
+We can search the id and distance in km of the closest station for given
 coordinates:
 
 ``` r
-id <- closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="id")
-km <- closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="dist")
+closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="id")
+#> [1] "02039"
+closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="dist")
+#> [1] 2.34
 ```
 
-We can process the table of locations as follows:
+We can also process the table of locations as follows:
 
 ``` r
 # With base R
@@ -151,16 +153,6 @@ head(locations)
 
 ``` r
 # With dplyr and pipes from magrittr (%>%):
-library(dplyr)
-#> 
-#> Attache Paket: 'dplyr'
-#> Die folgenden Objekte sind maskiert von 'package:stats':
-#> 
-#>     filter, lag
-#> Die folgenden Objekte sind maskiert von 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
-library(magrittr)
 locations %>% 
   mutate(station.id=closer_dwd_station(
     lat, lon, stations_table=stations.info)) %>% 
@@ -202,10 +194,9 @@ head(station.data)
 ?mutate_isip_weather_with_cumsum_gdd # cumulative sum of growing degree-days for ISIP weather data
 
 # In development
-?get_dwd_stations_info
-?dist_on_earth
-?closer_dwd_station
-?get_dwd_station_data
+?get_dwd_stations_info               # retrieve online info on DWD weather stations
+?closer_dwd_station                  # get closer DWD station from given coordinates
+?get_dwd_station_data                # retrieve online data of a DWD weather station
 ```
 
 ## Simple documentation of the functions
