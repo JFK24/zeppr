@@ -44,14 +44,12 @@ devtools::install_github("JFK24/zeppr")
 Let us create some toy count and weather data:
 
 ``` r
-# Create a data frame
 data.table <- data.frame(
   Date=as.Date(c("2022-03-01", "2022-03-02", "2022-03-03", "2022-03-04", "2022-03-05")),
   Count=c(0, 0, 10, 12, 2),
   Tmin=c(4, 6, 11, 9, 10),
   Tmax=c(12, 14, 13, 16, 14)
   )
-# Show top of the data frame
 head(data.table)
 #>         Date Count Tmin Tmax
 #> 1 2022-03-01     0    4   12
@@ -66,15 +64,11 @@ counts and the cumulative sum of growing degree-days (5°C\|30°C) as
 follows:
 
 ``` r
-# Load package
 library(zeppr)
-# normalized cumulative sum of the counts
 data.table$norm_cumsum <- normalized_cumsum(data.table$Count)
-# cumulative sum of growing degree-days (5°C|30°C)
 data.table <- mutate_cumsum_gdd(
   data.table, date=Date, t.min=Tmin, t.max=Tmax, 
   t.ceiling=30, t.base=5, use.floor=FALSE, hourly.data=FALSE)
-# Show top of the data frame
 head(data.table)
 #>         Date Count Tmin Tmax norm_cumsum cumsum_gdd
 #> 1 2022-03-01     0    4   12   0.0000000        3.0
@@ -88,7 +82,6 @@ Finally we can plot the new values with some plotting functions (not
 from `zeppr`):
 
 ``` r
-# Plot with the standard plotting functions
 plot(data.table$cumsum_gdd, 
      data.table$norm_cumsum, 
      type="o", 
@@ -104,35 +97,44 @@ Let us create some toy locations and corresponding geographic
 coordinates:
 
 ``` r
-# Create a data frame
+library(zeppr)
 locations <- data.frame(
   loc=c("A", "B", "C"),
   lat=c(49, 50, 52.52),
   lon=c(8, 9, 13.41)
 )
-# Show top of the data frame
-head(locations)
-#>   loc   lat   lon
-#> 1   A 49.00  8.00
-#> 2   B 50.00  9.00
-#> 3   C 52.52 13.41
 ```
 
-Thanks to `zeppr`, we retrieve the closest weather station from DWD
-weather service and find the closest station to some input coordinates
-as follows:
+Thanks to `zeppr`, we retrieve information on weather stations from DWD
+weather service offering data on air temperature as follows:
 
 ``` r
-# Load package
-library(zeppr)
 stations.info <- get_dwd_stations_info("air_temperature", timerange="historical")
-id <- closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="id")
-km <- closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="dist")
-print(id) # station id
-print(km) # distance to station in km
 ```
 
-We can process the locations table as follows:
+``` r
+head(stations.info)
+#> # A tibble: 6 × 8
+#>   station_id start_date end_date   altitude latitude longitude station…¹ bunde…²
+#>   <chr>      <date>     <date>        <dbl>    <dbl>     <dbl> <chr>     <chr>  
+#> 1 00003      1950-04-01 2011-03-31      202     50.8      6.09 Aachen    Nordrh…
+#> 2 00044      2007-04-01 2023-02-08       44     52.9      8.24 Großenkn… Nieder…
+#> 3 00052      1976-01-01 1988-01-01       46     53.7     10.2  Ahrensbu… Schles…
+#> 4 00071      2009-12-01 2019-12-31      759     48.2      8.98 Albstadt… Baden-…
+#> 5 00073      2007-04-01 2023-02-08      340     48.6     13.1  Aldersba… Bayern 
+#> 6 00078      2004-11-01 2023-02-08       64     52.5      7.91 Alfhausen Nieder…
+#> # … with abbreviated variable names ¹​station_name, ²​bundesland
+```
+
+We can search the id and distance of the closest station for given
+coordinates:
+
+``` r
+id <- closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="id")
+km <- closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="dist")
+```
+
+We can process the table of locations as follows:
 
 ``` r
 # With base R
@@ -141,8 +143,23 @@ locations$station.id <- closer_dwd_station(locations$lat, locations$lon,
 locations$station.name <- closer_dwd_station(locations$lat, locations$lon, 
   stations_table=stations.info, return_string = "name")
 head(locations)
+#>   loc   lat   lon station.id          station.name
+#> 1   A 49.00  8.00      00377       Bergzabern, Bad
+#> 2   B 50.00  9.00      02480             Kahl/Main
+#> 3   C 52.52 13.41      00399 Berlin-Alexanderplatz
+```
 
-# With dplyr abd pipes from magrittr (%>%):
+``` r
+# With dplyr and pipes from magrittr (%>%):
+library(dplyr)
+#> 
+#> Attache Paket: 'dplyr'
+#> Die folgenden Objekte sind maskiert von 'package:stats':
+#> 
+#>     filter, lag
+#> Die folgenden Objekte sind maskiert von 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 library(magrittr)
 locations %>% 
   mutate(station.id=closer_dwd_station(
@@ -151,13 +168,27 @@ locations %>%
     lat, lon, stations_table=stations.info, return_string = "name")) %>% 
   mutate(station.distance=closer_dwd_station(
     lat, lon, stations_table=stations.info, return_string = "dist"))
+#>   loc   lat   lon station.id          station.name station.distance
+#> 1   A 49.00  8.00      00377       Bergzabern, Bad            11.90
+#> 2   B 50.00  9.00      02480             Kahl/Main             7.17
+#> 3   C 52.52 13.41      00399 Berlin-Alexanderplatz             0.29
 ```
 
 Finally, we can get the weather data from a given station as follows:
 
 ``` r
 station.data <- get_dwd_station_data(station_id="00044", category="air_temperature")
+```
+
+``` r
 head(station.data)
+#>   station_id           timestamp Lufttemperatur relative_Feuchte
+#> 1      00044 2021-08-08 00:00:00           14.1             93.0
+#> 2      00044 2021-08-08 01:00:00           14.4             91.0
+#> 3      00044 2021-08-08 02:00:00           14.6             92.0
+#> 4      00044 2021-08-08 03:00:00           14.9             91.0
+#> 5      00044 2021-08-08 04:00:00           14.7             96.0
+#> 6      00044 2021-08-08 05:00:00           15.0             96.0
 ```
 
 ## Access documentation of the main functions from R
