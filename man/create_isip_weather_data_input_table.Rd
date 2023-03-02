@@ -21,9 +21,9 @@ create_isip_weather_data_input_table(
 
 \item{longitudes}{(dbl) vector of longitudes}
 
-\item{start_date}{(chr) starting date for weather data (set to 2*365 days ago if NA)}
+\item{start_date}{(chr) starting date for weather data (format: "2021-12-31"; set to 2*365 days ago if NA)}
 
-\item{end_date}{(chr) ending date for weather data (set to 7 days ago if NA)}
+\item{end_date}{(chr) ending date for weather data (format: "2022-12-31"; set to 7 days ago if NA)}
 
 \item{output.excel.path}{(chr) path to the output Excel file}
 

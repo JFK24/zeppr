@@ -7,8 +7,8 @@
 #' @param locations (chr) vector of location names
 #' @param latitudes (dbl) vector of latitudes
 #' @param longitudes (dbl) vector of longitudes
-#' @param start_date (chr) starting date for weather data (set to 2*365 days ago if NA)
-#' @param end_date (chr) ending date for weather data (set to 7 days ago if NA)
+#' @param start_date (chr) starting date for weather data (format: "2021-12-31"; set to 2*365 days ago if NA)
+#' @param end_date (chr) ending date for weather data (format: "2022-12-31"; set to 7 days ago if NA)
 #' @param output.excel.path (chr) path to the output Excel file
 #' @param overwrite (boolean) overwrite file if true, no overwrite otherwise
 #' @examples
@@ -35,9 +35,7 @@ create_isip_weather_data_input_table <- function(
     `bis (exkl.)`=as.Date(my.end_date, "%Y-%m-%d"),
     Intervall="Stunde"
   ) %>%
-    dplyr::distinct() %>%
-    dplyr::mutate(`von (inkl.)`=as.Date("01.10.2022", "%d.%m.%Y")) %>%
-    dplyr::mutate(`bis (exkl.)`=as.Date("16.01.2023", "%d.%m.%Y"))
+    dplyr::distinct()
   a <- stringi::stri_enc_tonative("geographische L\u00E4nge")
   names(my.table) <- c("Schlagname", "geographische Breite", a, "von (inkl.)", "bis (exkl.)", "Intervall")
   openxlsx::write.xlsx(my.table, output.excel.path, overwrite=overwrite)
