@@ -147,6 +147,7 @@ read_dwd_station_data_file <- function(station_zip_path){
 #'  station_id, timestamp, and a variable number of columns depending on the file.
 #' All columns are of type chr except timestamp of type `POSIXct`.
 #' @examples
+#' head(get_dwd_station_data(station_id="04719", category="air_temperature", timerange="historical"))
 #' head(get_dwd_station_data(station_id="00044", category="air_temperature"))
 #' head(get_dwd_station_data(station_id="00183", category="solar"))
 #' head(get_dwd_station_data(station_id="00044", category="dew_point", timerange="historical"))

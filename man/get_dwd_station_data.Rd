@@ -32,6 +32,7 @@ from its FTP site for a requested metrics category
 locally.
 }
 \examples{
+head(get_dwd_station_data(station_id="04719", category="air_temperature", timerange="historical"))
 head(get_dwd_station_data(station_id="00044", category="air_temperature"))
 head(get_dwd_station_data(station_id="00183", category="solar"))
 head(get_dwd_station_data(station_id="00044", category="dew_point", timerange="historical"))

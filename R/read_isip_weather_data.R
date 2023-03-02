@@ -1,4 +1,50 @@
 # ==============================================================================
+#' Creates an Input File for ISIP Weather Data Export Service
+#'
+#' Creates an Excel file to be used as input for the ISIP Weather Data Export
+#' Service.
+#'
+#' @param locations (chr) vector of location names
+#' @param latitudes (dbl) vector of latitudes
+#' @param longitudes (dbl) vector of longitudes
+#' @param start_date (chr) starting date for weather data (set to 2*365 days ago if NA)
+#' @param end_date (chr) ending date for weather data (set to 7 days ago if NA)
+#' @param output.excel.path (chr) path to the output Excel file
+#' @param overwrite (boolean) overwrite file if true, no overwrite otherwise
+#' @examples
+#' # Let us use an example dataset:
+#' locs <- c("A", "B", "C")
+#' lats <- c(50, 49, 48)
+#' lons <- c(10, 9, 8)
+#' # create_isip_weather_data_input_table(locs, lats, lons, "2022-01-01", "2022-12-31")
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#' @export
+create_isip_weather_data_input_table <- function(
+    locations, latitudes, longitudes, start_date=NA, end_date=NA,
+    output.excel.path="isip.input.xlsx", overwrite=FALSE){
+
+  my.end_date <- ifelse(is.na({{end_date}}), as.character(Sys.Date()-7), {{end_date}})
+  my.start_date <- ifelse(is.na({{start_date}}), as.character(Sys.Date()-365*2), {{start_date}})
+  my.table <- tibble::tibble(
+    Schlagname=as.character(locations),
+    `geographische Breite`=as.character(latitudes),
+    # "geographische L\u00E4nge"=as.character(longitudes),
+    "geographische Lange"=as.character(longitudes),
+    `von (inkl.)`=as.Date(my.start_date, "%Y-%m-%d"),
+    `bis (exkl.)`=as.Date(my.end_date, "%Y-%m-%d"),
+    Intervall="Stunde"
+  ) %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(`von (inkl.)`=as.Date("01.10.2022", "%d.%m.%Y")) %>%
+    dplyr::mutate(`bis (exkl.)`=as.Date("16.01.2023", "%d.%m.%Y"))
+  a <- stringi::stri_enc_tonative("geographische L\u00E4nge")
+  names(my.table) <- c("Schlagname", "geographische Breite", a, "von (inkl.)", "bis (exkl.)", "Intervall")
+  openxlsx::write.xlsx(my.table, output.excel.path, overwrite=overwrite)
+}
+
+
+# ==============================================================================
 #' Reads ISIP Hourly Weather Data File
 #'
 #' Reads an ISIP hourly weather export data file (Excel file; one row per hour)
