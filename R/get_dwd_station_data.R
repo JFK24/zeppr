@@ -142,9 +142,9 @@ read_dwd_station_data_file <- function(station_zip_path){
 #' cloudiness, dew_point, extreme_wind, moisture, precipitation, pressure,
 #' soil_temperature, solar, sun, visibility, weather_phenomena, wind, wind_synop
 #' @param timerange (`chr`) either "recent" or "historical"
-#' @return (`data.frame`) data frame of the stations data or `NA` if download
-#' failed. The data frame has the following columns: station_id, timestamp,
-#' and a variable number of columns depending on the file.
+#' @return (`data.frame`) data frame of the stations data or an empty data frame
+#'  if download failed. The data frame has the following columns:
+#'  station_id, timestamp, and a variable number of columns depending on the file.
 #' All columns are of type chr except timestamp of type `POSIXct`.
 #' @examples
 #' head(get_dwd_station_data(station_id="00044", category="air_temperature"))
@@ -163,7 +163,7 @@ get_dwd_station_data <- function(station_id="00044", category="air_temperature",
   if(is.na(code)){
     message("get_dwd_station_data(): unsupported category!")
     message(paste("parametrers: ", station_id, category))
-    return(NA)
+    return(data.frame())
   }
   suffix <- ifelse(timerange=="recent", "akt", "hist")
 
@@ -177,6 +177,7 @@ get_dwd_station_data <- function(station_id="00044", category="air_temperature",
   ftp.files <- XML::getHTMLLinks(web.page)
   station.file.name <- grep(paste(code, station_id, sep="_"), ftp.files, value = T)[1]
   station_data_url <- paste0(station_data_url, "/", station.file.name)
+  print(station_data_url)
 
   stations_data_file <- tempfile()
   out <- tryCatch(
@@ -186,16 +187,16 @@ get_dwd_station_data <- function(station_id="00044", category="air_temperature",
       message("get_dwd_station_data(): download failed!")
       message(paste("parametrers: ", station_id, category))
       message(e)
-      return(NA)
+      return(data.frame())
     }    ,
     warning=function(w) {
       message("get_dwd_station_data(): download may have failed!")
       message(paste("parametrers: ", station_id, category))
       message(w)
-      return(NA)
+      return(data.frame())
     }
     )
-  if(is.na(out)) {return(NA)}
+  if(is.na(out)) {return(data.frame())}
   stations_data_table <- read_dwd_station_data_file(stations_data_file)
   unlink(stations_data_file)
   return(stations_data_table)

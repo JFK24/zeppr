@@ -7,6 +7,6 @@ test_that("test closer_dwd_station()", {
   file.name.1 <- "TU_Stundenwerte_Beschreibung_Stationen.txt"
   path.1 <- system.file("extdata", file.name.1, package = "zeppr")
   my.stations <- read_dwd_stations_info_file(path.1)
-  expect_equal("00399", closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations))
-  expect_equal("Berlin-Alexanderplatz", closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations, return_string = "name"))
+  expect_equal("00399", closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations, start_date="1969-12-01", end_date="2011-08-01"))
+  expect_equal("Berlin-Alexanderplatz", closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations, start_date="1969-12-01", end_date="2011-08-01", return_string = "name"))
 })

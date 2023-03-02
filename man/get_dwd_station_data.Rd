@@ -20,9 +20,9 @@ soil_temperature, solar, sun, visibility, weather_phenomena, wind, wind_synop}
 \item{timerange}{(\code{chr}) either "recent" or "historical"}
 }
 \value{
-(\code{data.frame}) data frame of the stations data or \code{NA} if download
-failed. The data frame has the following columns: station_id, timestamp,
-and a variable number of columns depending on the file.
+(\code{data.frame}) data frame of the stations data or an empty data frame
+if download failed. The data frame has the following columns:
+station_id, timestamp, and a variable number of columns depending on the file.
 All columns are of type chr except timestamp of type \code{POSIXct}.
 }
 \description{

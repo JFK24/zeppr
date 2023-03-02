@@ -43,8 +43,10 @@ dist_on_earth <- function(lat1, lat2, lon1, lon2, output_unit="km"){
 #'
 #' @param lat (dbl) latitude in degree of point of interest
 #' @param lon (dbl) longitude in degree of point of interest
-#' @param start_date (chr) stations must have data from this date or earlier (e.g. 2022-06-30)
-#' @param end_date (chr) stations must have data until this date or later (e.g. 2023-01-30)
+#' @param start_date (chr) stations must have data from this date or earlier (e.g. 2022-06-30).
+#' Default: set to 2*365 days ago.
+#' @param end_date (chr) stations must have data until this date or later (e.g. 2023-01-30).
+#' Default: set to 7 days ago.
 #' @param stations_table (data.frame) table of stations info as provided by
 #' functions [get_dwd_stations_info()] or [read_dwd_stations_info_file()]
 #' @param return_string (chr) will return station id if set to "id",
@@ -57,23 +59,31 @@ dist_on_earth <- function(lat1, lat2, lon1, lon2, output_unit="km"){
 #' path.1 <- system.file("extdata", file.name.1, package = "zeppr")
 #' my.stations <- read_dwd_stations_info_file(path.1)
 #' # Some examples
-#' closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations)
-#' closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations, return_string = "name")
-#' closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations, return_string = "dist")
-#' closer_dwd_station(52.518611, 13.4083330, stations_table=my.stations, return_string = "all")
+#' closer_dwd_station(50.8, 6.09, stations_table=my.stations, end_date="2023-02-08")
+#' closer_dwd_station(52.52, 13.41, stations_table=my.stations, end_date="2023-02-08")
+#' closer_dwd_station(52.52, 13.41, stations_table=my.stations, end_date="2023-02-08",
+#' return_string = "name")
+#' closer_dwd_station(52.52, 13.41, stations_table=my.stations, end_date="2023-02-08",
+#' return_string = "dist")
+#' closer_dwd_station(52.52, 13.41, stations_table=my.stations, end_date="2023-02-08",
+#' return_string = "all")
 #' # given a simple data.frame with 3 pairs of geographic coordinates
 #' loc <- data.frame(lat=c(49, 50, 52.52), lon=c(8, 9, 13.41))
 #' # we add a column containing for each pair the id of the closest station as follows:
-#' loc$station.id <- closer_dwd_station(loc$lat, loc$lon, stations_table=my.stations)
+#' loc$station.id <- closer_dwd_station(loc$lat, loc$lon, stations_table=my.stations,
+#' end_date="2023-02-08")
 #' head(loc)
 #' @export
 # ==============================================================================
 closer_dwd_station <- function(lat, lon,
-                               start_date="2023-01-01", end_date="2023-01-31",
+                               start_date=NA, end_date=NA,
                                stations_table, return_string="id"){
 
-  my_station_table <- stations_table %>%
-    dplyr::filter(.data$start_date <= {{start_date}} & .data$end_date >= {{end_date}}) %>%
+  my.end_date <- ifelse(is.na({{end_date}}), as.character(Sys.Date()-7), {{end_date}})
+  my.start_date <- ifelse(is.na({{start_date}}), as.character(Sys.Date()-365*2), {{start_date}})
+  my_station_table_0 <- stations_table %>%
+    dplyr::filter(.data$start_date <= my.start_date) %>%
+    dplyr::filter(.data$end_date >= my.end_date) %>%
     dplyr::mutate(start_date=as.character(.data$start_date)) %>%
     dplyr::mutate(end_date=as.character(.data$end_date))
 
@@ -83,16 +93,14 @@ closer_dwd_station <- function(lat, lon,
   )
   res <- c()
   for(i in 1:nrow(my.pairs)){
-    my_station_table <- stations_table %>%
+    my_station_table <- my_station_table_0 %>%
       dplyr::mutate(dist_km=dist_on_earth(.data$latitude, my.pairs$latitude[i], .data$longitude, my.pairs$longitude[i])) %>%
       dplyr::mutate(dist_km=round(.data$dist_km, 2)) %>%
       dplyr::slice_min(order_by = .data$dist_km)
-    # return_value=paste(names(my_station_table), my_station_table[1,], sep="=", collapse = ",")
-    return_value=my_station_table[1,]$station_id
-    if(return_string=="name"){return_value=my_station_table[1,]$station_name}
-    # if(return_string=="id"){return_value=my_station_table[1,]$station_id}
+    return_value=paste(names(my_station_table), my_station_table[1,], sep="=", collapse = ",")
+    if(return_string=="id"){return_value=my_station_table[1,]$station_id}
     if(return_string=="dist"){return_value=my_station_table[1,]$dist_km}
-    # if(return_string=="dist"){return_value=my_station_table[[1, "dist_km"]]}
+    if(return_string=="name"){return_value=my_station_table[1,]$station_name}
     res <- c(res, return_value)
   }
   return(res)
