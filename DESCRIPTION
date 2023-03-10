@@ -1,7 +1,7 @@
 Package: zeppr
 Type: Package
 Title: Data Processing for Plant Protection Research (Beta!)
-Version: 0.1.0
+Version: 0.2.1
 Author: Dr. Fontaine
 Maintainer: Dr. Fontaine <fontaine@zepp.info>
 Description: Collection of functions for processing and analyzing plant 
@@ -23,6 +23,7 @@ Imports:
     readxl (>= 1.4),
     rlang (>= 1.0),
     slider (>= 0.3),
+    stats,
     stringi (>= 1.7.12),
     stringr (>= 0.5),
     tibble (>= 3.1),
