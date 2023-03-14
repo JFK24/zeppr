@@ -131,18 +131,22 @@ function does not care about locations or years. Thus, as our data contains
 multiple locations, we must group it before hands.
 
 ```{r}
-# add cumulative sum of growing degree-days by location and year (column cumsum_gdd)
+# add cumulative sum of growing degree-days by location and year (new column: cumsum_gdd)
 daily.table <- mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
+
 # we MUST group the data by locations before counting temperature indices 
 daily.table <- group_by(daily.table, location)
-# classify days by temperature indices (ice, frost, vegetation, ...)
+
+# classify days by each temperature index (new columns: ice, frost, vegetation, ...)
 daily.table <- mutate_past_day_temp_indices(daily.table, date, Tmin, Tmax, no.suffix=TRUE)
-# count days by 2 temperature indices in the last 3 days (vegetation_last_3d, ...)
+
+# count days by each temperature index in the last 3 days (vegetation_last_3d, ...)
 daily.table <- mutate_past_day_temp_indices(daily.table, date, Tmin, Tmax, n.days = 3)
-# count longest period of vegetation days in the last 4 days (vegetation_last_4d_lp, ...) 
+
+# count longest period of index-matching days in the last 4 days (vegetation_last_4d_lp, ...) 
 daily.table <- mutate_past_day_temp_indices(daily.table, date, Tmin, Tmax, n.days = 4, longest_period = TRUE)
 
-# Let us see the vegetation index (the table still contains results for all indices: ice, frost, ...)
+# See results for cumsum_gdd and vegetation index (the table still contains results for all indices: ice, frost, ...)
 print(daily.table[, c("location", "date", "Tmin", "Tmax", "cumsum_gdd", "vegetation", "vegetation_last_3d", "vegetation_last_4d_lp")])
 
 ```
