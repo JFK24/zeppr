@@ -153,8 +153,8 @@ read_isip_hourly_weather_data <- function(
 #' data otherwise. Processing hourly data as daily data will likely result in
 #' only NA values in the new column. The other way around will return values
 #' but they will not be correct.
-#' @param max.per.day (boolean) outputs the maximum per day if `TRUE`,
-#' reports for each hour otherwise (relevant only for hourly data)
+# #' @param max.per.day (boolean) outputs the maximum per day if `TRUE`,
+# #' reports for each hour otherwise (relevant only for hourly data)
 #' @param start.month (integer from 1 to 12) within a year, calculations start from this given month (before this month all values are set to 0)
 #' @param start.monthday (integer from 1 to 31) within the starting month of a year (`start.month`), calculations start from this given day (before this day all values are set to 0)
 #' @param values.to (chr) name of the new column to be added
@@ -166,15 +166,11 @@ read_isip_hourly_weather_data <- function(
 #' # ---------------------------------------------------------------------------
 #' file <- "20221215_isip_hourly_weather_data_export.xlsx"
 #' path <- system.file("extdata", file, package = "zeppr")
-#' # ---------------------------------------------------------------------------
-#' # Reads hourly data and derive results by hours with or without day summary:
-#' # ---------------------------------------------------------------------------
-#' # reads file and keeps only 5 columns and 6 rows (6 hours)
+#' # reads file and keeps only 5 columns and 6 rows (6 hours) as example
 #' hourly.table <- read_isip_hourly_weather_data(path)[1:6,1:5]
 #' # adds cumulative growing degree-days per row divided by 24
 #' mutate_isip_weather_with_cumsum_gdd(hourly.table)
-#' # keep maximum value per day
-#' mutate_isip_weather_with_cumsum_gdd(hourly.table, max.per.day=TRUE)
+#'
 #' # ---------------------------------------------------------------------------
 #' # Reads as daily data and derive results by days with or without floor value:
 #' # ---------------------------------------------------------------------------
@@ -184,6 +180,7 @@ read_isip_hourly_weather_data <- function(
 #' mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 #' # use floor value for min and max temperatures
 #' mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE)
+#'
 #' # ---------------------------------------------------------------------------
 #' # Apply 2 times the function with magrittr pipes and tuned parameters:
 #' # ---------------------------------------------------------------------------
@@ -193,8 +190,7 @@ read_isip_hourly_weather_data <- function(
 #'   mutate_isip_weather_with_cumsum_gdd(
 #'     t.ceiling=26, t.base=6, use.floor=TRUE, values.to="cs_gdd_1") %>%
 #'   mutate_isip_weather_with_cumsum_gdd(
-#'     t.ceiling=26, t.base=6, use.floor=TRUE, values.to="cs_gdd_2",
-#'     max.per.day=TRUE) %>%
+#'     t.ceiling=30, t.base=4, use.floor=TRUE, values.to="cs_gdd_2") %>%
 #'   print(n=48)
 #' @importFrom magrittr %>%
 #' @importFrom rlang :=
@@ -207,7 +203,7 @@ mutate_isip_weather_with_cumsum_gdd <- function(
     t.base=5,
     use.floor=FALSE,
     daily.data=FALSE,
-    max.per.day=FALSE,
+    # max.per.day=FALSE,
     start.month=1,
     start.monthday=1,
     values.to="cumsum_gdd"){
@@ -227,7 +223,8 @@ mutate_isip_weather_with_cumsum_gdd <- function(
         zeppr::mutate_cumsum_gdd,
         date=.data$date, t.min=.data$Tmin, t.max=.data$Tmax, t.ceiling=t.ceiling,
         t.base=t.base, use.floor=use.floor, hourly.data=!daily.data,
-        max.per.day=max.per.day, values.to={{values.to}}
+        # max.per.day=max.per.day,
+        values.to={{values.to}}
       ) %>%
       dplyr::mutate({{values.to}}:= .data[[values.to]] * .data$counting) %>%
       dplyr::select(-"year.198445789832", -"month.198445789832", -"day.198445789832b", -"counting")
@@ -238,7 +235,8 @@ mutate_isip_weather_with_cumsum_gdd <- function(
         zeppr::mutate_cumsum_gdd,
         date=.data$date, t.min=.data$Tavg, t.max=.data$Tavg, t.ceiling=t.ceiling,
         t.base=t.base, use.floor=use.floor, hourly.data=!daily.data,
-        max.per.day=max.per.day, values.to={{values.to}}
+        # max.per.day=max.per.day,
+        values.to={{values.to}}
       ) %>%
       dplyr::mutate({{values.to}}:= .data[[values.to]] * .data$counting) %>%
       dplyr::select(-"year.198445789832", -"month.198445789832", -"day.198445789832b", -"counting")

@@ -10,7 +10,6 @@ mutate_isip_weather_with_cumsum_gdd(
   t.base = 5,
   use.floor = FALSE,
   daily.data = FALSE,
-  max.per.day = FALSE,
   start.month = 1,
   start.monthday = 1,
   values.to = "cumsum_gdd"
@@ -31,9 +30,6 @@ if \code{TRUE}, nothing more otherwise}
 data otherwise. Processing hourly data as daily data will likely result in
 only NA values in the new column. The other way around will return values
 but they will not be correct.}
-
-\item{max.per.day}{(boolean) outputs the maximum per day if \code{TRUE},
-reports for each hour otherwise (relevant only for hourly data)}
 
 \item{start.month}{(integer from 1 to 12) within a year, calculations start from this given month (before this month all values are set to 0)}
 
@@ -63,15 +59,11 @@ Growing degree-days are calculated as defined in function \code{\link[=growing_d
 # ---------------------------------------------------------------------------
 file <- "20221215_isip_hourly_weather_data_export.xlsx"
 path <- system.file("extdata", file, package = "zeppr")
-# ---------------------------------------------------------------------------
-# Reads hourly data and derive results by hours with or without day summary:
-# ---------------------------------------------------------------------------
-# reads file and keeps only 5 columns and 6 rows (6 hours)
+# reads file and keeps only 5 columns and 6 rows (6 hours) as example
 hourly.table <- read_isip_hourly_weather_data(path)[1:6,1:5]
 # adds cumulative growing degree-days per row divided by 24
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
-# keep maximum value per day
-mutate_isip_weather_with_cumsum_gdd(hourly.table, max.per.day=TRUE)
+
 # ---------------------------------------------------------------------------
 # Reads as daily data and derive results by days with or without floor value:
 # ---------------------------------------------------------------------------
@@ -81,6 +73,7 @@ daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:6,
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 # use floor value for min and max temperatures
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE)
+
 # ---------------------------------------------------------------------------
 # Apply 2 times the function with magrittr pipes and tuned parameters:
 # ---------------------------------------------------------------------------
@@ -90,7 +83,6 @@ hourly.table \%>\%
   mutate_isip_weather_with_cumsum_gdd(
     t.ceiling=26, t.base=6, use.floor=TRUE, values.to="cs_gdd_1") \%>\%
   mutate_isip_weather_with_cumsum_gdd(
-    t.ceiling=26, t.base=6, use.floor=TRUE, values.to="cs_gdd_2",
-    max.per.day=TRUE) \%>\%
+    t.ceiling=30, t.base=4, use.floor=TRUE, values.to="cs_gdd_2") \%>\%
   print(n=48)
 }

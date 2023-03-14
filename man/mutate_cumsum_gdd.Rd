@@ -13,7 +13,6 @@ mutate_cumsum_gdd(
   t.base = 5,
   use.floor = FALSE,
   hourly.data = FALSE,
-  max.per.day = FALSE,
   values.to = "cumsum_gdd"
 )
 }
@@ -41,9 +40,6 @@ if hourly data  (numeric column)}
 
 \item{hourly.data}{(boolean) considers the data as hourly data and thus
 divides the values by 24 if \code{TRUE}, considers as daily data otherwise.}
-
-\item{max.per.day}{(boolean) retains the maximum value per day if \code{TRUE}
-(relevant only for hourly data)}
 
 \item{values.to}{(chr) name of the new column to store the results}
 }

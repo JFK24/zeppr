@@ -81,8 +81,8 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 #' `t.min` if `TRUE`, nothing more otherwise
 #' @param hourly.data (boolean) considers the data as hourly data and thus
 #' divides the values by 24 if `TRUE`, considers as daily data otherwise.
-#' @param max.per.day (boolean) retains the maximum value per day if `TRUE`
-#' (relevant only for hourly data)
+# #' @param max.per.day (boolean) retains the maximum value per day if `TRUE`
+# #' (relevant only for hourly data)
 #' @param values.to (chr) name of the new column to store the results
 #' @return (data.frame) table copying `df` but adding a numerical column for
 #' the cumulative sum of growing degree-days
@@ -104,7 +104,8 @@ growing_degree_days <- function(t.min, t.max, t.ceiling=30, t.base=5, use.floor=
 # ==============================================================================
 mutate_cumsum_gdd <- function(df, date, t.min, t.max, t.ceiling=30, t.base=5,
                               use.floor=FALSE, hourly.data=FALSE,
-                              max.per.day=FALSE, values.to="cumsum_gdd"){
+                              # max.per.day=FALSE,
+                              values.to="cumsum_gdd"){
 
   df <- df %>%
     dplyr::mutate("gdd.19815454532"=growing_degree_days({{t.min}}, {{t.max}}, t.ceiling, t.base, use.floor)) %>%
@@ -114,15 +115,15 @@ mutate_cumsum_gdd <- function(df, date, t.min, t.max, t.ceiling=30, t.base=5,
     df <- df %>%
       dplyr::mutate({{values.to}}:=.data[[values.to]]/24)
   }
-  if(max.per.day){
-    df <- df %>%
-      dplyr::mutate(day.198445789832=as.Date(.data$date)) %>%
-      dplyr::with_groups(
-        .groups = c("location", "day.198445789832"),
-        dplyr::mutate,
-        {{values.to}}:=max(.data[[values.to]])
-      ) %>%
-      dplyr::select(-"day.198445789832")
-  }
+  # if(max.per.day){
+  #   df <- df %>%
+  #     dplyr::mutate(day.198445789832=as.Date(.data$date)) %>%
+  #     dplyr::with_groups(
+  #       .groups = c(day.198445789832),
+  #       dplyr::mutate,
+  #       {{values.to}}:=max(.data[[values.to]])
+  #     ) %>%
+  #     dplyr::select(-"day.198445789832")
+  # }
   return(df)
 }
