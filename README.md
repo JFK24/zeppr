@@ -31,15 +31,115 @@ devtools::install_github("JFK24/zeppr@v0.2.1-beta")
 ```
 
 Alternatively, you can install the development version of `zeppr` as
-follows to get potential new features but also new potential new bugs:
+follows to get potential new features but also new potential bugs:
 
 ``` r
 devtools::install_github("JFK24/zeppr")
 ```
 
+## Overview
+
+### Documentation
+
+Full documentation of the ZEPPR functions are available from within R.
+On this page, only a examples and use cases are shown.
+
+### Functions
+
+``` r
+# Already in the latest release
+normalized_cumsum                   # normalized cumulative sum
+growing_degree_days                 # growing degree days for 1 day
+mutate_cumsum_gdd                   # cumulative sum of growing degree-days
+read_isip_hourly_weather_data       # reads weather data from an ISIP Excel file
+mutate_isip_weather_with_cumsum_gdd # cumulative sum of growing degree-days for ISIP weather data
+
+# In development:
+
+# Weather data retrieval
+get_dwd_stations_info               # retrieve online info on DWD weather stations
+closer_dwd_station                  # get closer DWD station from given coordinates
+get_dwd_station_data                # retrieve online data of a DWD weather station
+
+# temperature index (Klimatologische Kenntage)
+day_temp_index                      # classify single days by a temperature index
+past_day_temp_index                 # count or classify past days by a temperature index
+mutate_past_day_temp_indices        # count or classify multiple indices in a data frame
+```
+
 ## Simple use cases
 
-### Use case 1
+### Use case - Enrich Weather Data
+
+Let us work on a small fake weather data table with 2 locations. It was
+created from a real ISIP file and opened by function
+`read_isip_hourly_weather_data(returns.daily.data=TRUE)`. It is thus
+compatible with functions dedicated to ISIP weather data
+(`mutate_isip_*`).
+
+``` r
+library(zeppr)
+library(dplyr)
+
+print(daily.table)
+#> # A tibble: 10 × 4
+#>    location date         Tmin  Tmax
+#>    <chr>    <date>      <dbl> <dbl>
+#>  1 BWWR100  2022-01-01 -1      4   
+#>  2 BWWR100  2022-01-02  3.44  12.9 
+#>  3 BWWR100  2022-01-03  9.39  13.1 
+#>  4 BWWR100  2022-01-04  4.51  11.9 
+#>  5 BWWR100  2022-01-05  2.29   5.75
+#>  6 ABCD     2022-01-01 -2.09   9.71
+#>  7 ABCD     2022-01-02 -2.62   8.02
+#>  8 ABCD     2022-01-03  0.725  9.21
+#>  9 ABCD     2022-01-04 -0.314 11.0 
+#> 10 ABCD     2022-01-05 -1.81   9.93
+```
+
+Then, we add easily a column for the cumulative sum of Growing Degree
+Days (with default parameters) thanks to an ISIP dedicated function:
+`mutate_isip_weather_with_cumsum_gdd()`. This function will take care to
+separate calculations by locations and years if necessary.
+
+We can use an other function to classify days by temperature index or to
+count them in the last days: `mutate_past_day_temp_indices()`. Contrary
+to the growing degree days function, this generic function does not care
+about locations or years. Thus, as our data contains multiple locations,
+we must group it before hands.
+
+``` r
+# add cumulative sum of growing degree-days by location and year (column cumsum_gdd)
+daily.table <- mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
+# we MUST group the data by locations before counting temperature indices 
+daily.table <- group_by(daily.table, location)
+# classify days by temperature indices (ice, frost, vegetation, ...)
+daily.table <- mutate_past_day_temp_indices(daily.table, date, Tmin, Tmax, no.suffix=TRUE)
+# count days by 2 temperature indices in the last 3 days (vegetation_last_3d, ...)
+daily.table <- mutate_past_day_temp_indices(daily.table, date, Tmin, Tmax, n.days = 3)
+# count longest period of vegetation days in the last 4 days (vegetation_last_4d_lp, ...) 
+daily.table <- mutate_past_day_temp_indices(daily.table, date, Tmin, Tmax, n.days = 4, longest_period = TRUE)
+
+# Let us see the vegetation index (the table still contains results for all indices: ice, frost, ...)
+print(daily.table[, c("location", "date", "Tmin", "Tmax", "cumsum_gdd", "vegetation", "vegetation_last_3d", "vegetation_last_4d_lp")])
+#> # A tibble: 10 × 8
+#> # Groups:   location [2]
+#>    location date         Tmin  Tmax cumsum_gdd vegetation vegetation_l…¹ veget…²
+#>    <chr>    <date>      <dbl> <dbl>      <dbl>      <dbl>          <dbl>   <int>
+#>  1 ABCD     2022-01-01 -2.09   9.71      0              0             NA      NA
+#>  2 ABCD     2022-01-02 -2.62   8.02      0              0             NA      NA
+#>  3 ABCD     2022-01-03  0.725  9.21      0              0              0      NA
+#>  4 ABCD     2022-01-04 -0.314 11.0       0.323          1              1       1
+#>  5 ABCD     2022-01-05 -1.81   9.93      0.323          0              1       1
+#>  6 BWWR100  2022-01-01 -1      4         0              0             NA      NA
+#>  7 BWWR100  2022-01-02  3.44  12.9       3.15           1             NA      NA
+#>  8 BWWR100  2022-01-03  9.39  13.1       9.40           1              2      NA
+#>  9 BWWR100  2022-01-04  4.51  11.9      12.6            1              3       3
+#> 10 BWWR100  2022-01-05  2.29   5.75     12.6            0              2       3
+#> # … with abbreviated variable names ¹​vegetation_last_3d, ²​vegetation_last_4d_lp
+```
+
+### Use case - Cumulative Sums
 
 Let us create some toy count and weather data:
 
@@ -89,9 +189,9 @@ plot(data.table$cumsum_gdd,
      ylab="normalized cumulative sum of counts")
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
-### Use case 2
+### Use case 2 - DWD Weather Data
 
 Let us create some toy locations and corresponding geographic
 coordinates:
@@ -131,9 +231,9 @@ coordinates:
 
 ``` r
 closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="id")
-#> [1] "02039"
+#> [1] NA
 closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="dist")
-#> [1] 2.34
+#> [1] NA
 ```
 
 We can also process the table of locations as follows:
@@ -145,10 +245,10 @@ locations$station.id <- closer_dwd_station(locations$lat, locations$lon,
 locations$station.name <- closer_dwd_station(locations$lat, locations$lon, 
   stations_table=stations.info, return_string = "name")
 head(locations)
-#>   loc   lat   lon station.id          station.name
-#> 1   A 49.00  8.00      00377       Bergzabern, Bad
-#> 2   B 50.00  9.00      02480             Kahl/Main
-#> 3   C 52.52 13.41      00399 Berlin-Alexanderplatz
+#>   loc   lat   lon station.id station.name
+#> 1   A 49.00  8.00       <NA>         <NA>
+#> 2   B 50.00  9.00       <NA>         <NA>
+#> 3   C 52.52 13.41       <NA>         <NA>
 ```
 
 ``` r
@@ -160,10 +260,10 @@ locations %>%
     lat, lon, stations_table=stations.info, return_string = "name")) %>% 
   mutate(station.distance=closer_dwd_station(
     lat, lon, stations_table=stations.info, return_string = "dist"))
-#>   loc   lat   lon station.id          station.name station.distance
-#> 1   A 49.00  8.00      00377       Bergzabern, Bad            11.90
-#> 2   B 50.00  9.00      02480             Kahl/Main             7.17
-#> 3   C 52.52 13.41      00399 Berlin-Alexanderplatz             0.29
+#>   loc   lat   lon station.id station.name station.distance
+#> 1   A 49.00  8.00       <NA>         <NA>               NA
+#> 2   B 50.00  9.00       <NA>         <NA>               NA
+#> 3   C 52.52 13.41       <NA>         <NA>               NA
 ```
 
 Finally, we can get the weather data from a given station as follows:
@@ -181,22 +281,6 @@ head(station.data)
 #> 4      00044 2021-08-08 03:00:00           14.9             91.0
 #> 5      00044 2021-08-08 04:00:00           14.7             96.0
 #> 6      00044 2021-08-08 05:00:00           15.0             96.0
-```
-
-## Access documentation of the main functions from R
-
-``` r
-# Already in the latest release
-?normalized_cumsum                   # normalized cumulative sum
-?growing_degree_days                 # growing degree days for 1 day
-?mutate_cumsum_gdd                   # cumulative sum of growing degree-days
-?read_isip_hourly_weather_data       # reads weather data from an ISIP Excel file
-?mutate_isip_weather_with_cumsum_gdd # cumulative sum of growing degree-days for ISIP weather data
-
-# In development
-?get_dwd_stations_info               # retrieve online info on DWD weather stations
-?closer_dwd_station                  # get closer DWD station from given coordinates
-?get_dwd_station_data                # retrieve online data of a DWD weather station
 ```
 
 ## Simple documentation of the functions
@@ -383,17 +467,6 @@ mutate_isip_weather_with_cumsum_gdd(hourly.table)
 #> 4 BWWR100  2022-01-01 03:00:00    NA  9.12    NA      0.735
 #> 5 BWWR100  2022-01-01 04:00:00    NA  9.01    NA      0.902
 #> 6 BWWR100  2022-01-01 05:00:00    NA  8.80    NA      1.06
-# keeps only the maximum value per day
-mutate_isip_weather_with_cumsum_gdd(hourly.table, max.per.day=TRUE)
-#> # A tibble: 6 × 6
-#>   location date                 Tmin  Tavg  Tmax cumsum_gdd
-#>   <chr>    <dttm>              <dbl> <dbl> <dbl>      <dbl>
-#> 1 BWWR100  2022-01-01 00:00:00    NA  9.83    NA       1.06
-#> 2 BWWR100  2022-01-01 01:00:00    NA  9.48    NA       1.06
-#> 3 BWWR100  2022-01-01 02:00:00    NA  9.21    NA       1.06
-#> 4 BWWR100  2022-01-01 03:00:00    NA  9.12    NA       1.06
-#> 5 BWWR100  2022-01-01 04:00:00    NA  9.01    NA       1.06
-#> 6 BWWR100  2022-01-01 05:00:00    NA  8.80    NA       1.06
 ```
 
 Processing daily data:
