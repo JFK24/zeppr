@@ -10,6 +10,7 @@ create_isip_weather_data_input_table(
   longitudes,
   start_date = NA,
   end_date = NA,
+  daily = FALSE,
   output.excel.path = "isip.input.xlsx",
   overwrite = FALSE
 )
@@ -25,6 +26,8 @@ create_isip_weather_data_input_table(
 
 \item{end_date}{(chr) ending date for weather data (format: "2022-12-31"; set to 7 days ago if NA)}
 
+\item{daily}{(boolean) returns daily data if TRUE, hourly data otherwise}
+
 \item{output.excel.path}{(chr) path to the output Excel file}
 
 \item{overwrite}{(boolean) overwrite file if true, no overwrite otherwise}
@@ -38,5 +41,6 @@ Service.
 locs <- c("A", "B", "C")
 lats <- c(50, 49, 48)
 lons <- c(10, 9, 8)
-# create_isip_weather_data_input_table(locs, lats, lons, "2022-01-01", "2022-12-31")
+# create_isip_weather_data_input_table(locs, lats, lons, "2022-01-01", "2022-01-10")
+# create_isip_weather_data_input_table(locs, lats, lons, "2022-01-01", "2022-01-10", daily=T)
 }

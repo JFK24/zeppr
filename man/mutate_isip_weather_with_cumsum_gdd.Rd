@@ -12,12 +12,13 @@ mutate_isip_weather_with_cumsum_gdd(
   daily.data = FALSE,
   start.month = 1,
   start.monthday = 1,
-  values.to = "cumsum_gdd"
+  values.to = "cumsum_gdd",
+  show.warnings = TRUE
 )
 }
 \arguments{
 \item{isip.df}{(data.frame) table of weather data created with
-function \code{\link[=read_isip_hourly_weather_data]{read_isip_hourly_weather_data()}}}
+function \code{\link[=read_isip_weather_data]{read_isip_weather_data()}}}
 
 \item{t.ceiling}{(dbl) ceiling temperature value}
 
@@ -36,19 +37,26 @@ but they will not be correct.}
 \item{start.monthday}{(integer from 1 to 31) within the starting month of a year (\code{start.month}), calculations start from this given day (before this day all values are set to 0)}
 
 \item{values.to}{(chr) name of the new column to be added}
+
+\item{show.warnings}{(boolean) shown warnings if TRUE, nothing otherwise.
+There is a warning if a daily data has no min temperature. It is expected for
+daily ISIP data files but not for hourly ISIP data files that were converted
+to daily data.}
 }
 \value{
 (data.frame) mutated table with an additional column for the
 cumulative sum of the growing degree-days
 }
 \description{
-The ISIP data should be loaded by function \code{\link[=read_isip_hourly_weather_data]{read_isip_hourly_weather_data()}}.
+The ISIP data should be loaded by function \code{\link[=read_isip_weather_data]{read_isip_weather_data()}}.
 For each location and each year in the data, time points (rows of the
 table) are expected to be complete starting from 1st January to last time
 point of interest (e.g. every hour or every day from 01 January to 30 June).
 The data will be ordered by location and time, temporarily grouped by
 location and year, and then the cumulative sum of growing degree-days at
 each time point (each day or each hour) will be stored in a new column.
+If the data has min and max temperatures, they are used for the calculation,
+otherwise the given average temperature is used.
 Make sure that the \code{daily.data} parameter is appropriately set to fit
 your data.
 Growing degree-days are calculated as defined in function \code{\link[=growing_degree_days]{growing_degree_days()}}.
@@ -60,7 +68,7 @@ Growing degree-days are calculated as defined in function \code{\link[=growing_d
 file <- "20221215_isip_hourly_weather_data_export.xlsx"
 path <- system.file("extdata", file, package = "zeppr")
 # reads file and keeps only 5 columns and 6 rows (6 hours) as example
-hourly.table <- read_isip_hourly_weather_data(path)[1:6,1:5]
+hourly.table <- read_isip_weather_data(path)[1:6,1:5]
 # adds cumulative growing degree-days per row divided by 24
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
 
@@ -68,17 +76,27 @@ mutate_isip_weather_with_cumsum_gdd(hourly.table)
 # Reads as daily data and derive results by days with or without floor value:
 # ---------------------------------------------------------------------------
 # reads file and keeps only 5 columns and 6 rows (6 days)
-daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:6,1:5]
+daily.table <- read_isip_weather_data(path, hourly.to.daily=TRUE)[1:6,1:5]
 # adds cumulative growing degree-days per row
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 # use floor value for min and max temperatures
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE)
 
 # ---------------------------------------------------------------------------
+# Reads daily data file without Tmin and Tmax values and apply the function:
+# ---------------------------------------------------------------------------
+# reads file and keeps only 5 columns and 6 rows (6 days)
+file.name.2 <- "20230330_isip_daily_weather_data_export.xlsx"
+path.2 <- system.file("extdata", file.name.2, package = "zeppr")
+daily.table <- read_isip_weather_data(path.2, read.daily=TRUE)[1:6,1:5]
+# adds cumulative growing degree-days per row
+mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
+
+# ---------------------------------------------------------------------------
 # Apply 2 times the function with magrittr pipes and tuned parameters:
 # ---------------------------------------------------------------------------
 library(magrittr)
-hourly.table <- read_isip_hourly_weather_data(path)[1:48,1:5]
+hourly.table <- read_isip_weather_data(path)[1:48,1:5]
 hourly.table \%>\%
   mutate_isip_weather_with_cumsum_gdd(
     t.ceiling=26, t.base=6, use.floor=TRUE, values.to="cs_gdd_1") \%>\%

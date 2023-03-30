@@ -55,7 +55,7 @@ devtools::install_github("JFK24/zeppr")
 ### Documentation
 
 Full documentation of the ZEPPR functions are available from within R. 
-On this page, only a examples and use cases are shown. 
+On this page, only examples and use cases are shown. 
 
 ### Functions
 
