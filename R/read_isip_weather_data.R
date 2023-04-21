@@ -153,6 +153,81 @@ read_isip_weather_data <- function(
 
 
 # ==============================================================================
+#' Copies ISIP Weather Data from Excel to TSV or TSV.GZ file
+#'
+#' Reads an ISIP hourly or daily weather export data file (Excel file;
+#' one row per hour or per day, respectively)
+#' and writes the resulting data frame into a TSV or TSV.GZ file.
+#' This function is based on function `read_isip_weather_data()`
+#' (see documentation).
+#' Thus, same options are available when reading the input file.
+#' E.g., it can convert hourly to daily data.
+#' The new file can be read with function `read_tsv` from package `readr` and
+#' the resulting data frame will be compatible with functions dedicated to
+#' ISIP weather data in ZEPPR (e.g. `mutate_isip_weather_with_cumsum_gdd()`).
+#'
+#' @param input.excel.path (chr) path to ISIP weather export data file (Excel
+#' file). ISIP's Excel Data format as of Dec 2022.
+#' @param output.tsv.path (chr) path to output TSV file
+#' @param append If FALSE, will overwrite existing file. If TRUE, will append
+#' to existing file. In both cases, if the file does not exist a new file is created.
+#' @param read.daily.data (boolean) input file is expected to contain daily data
+#' if TRUE, hourly data otherwise
+#' @param hourly.to.daily (boolean) returns daily data if `TRUE`,
+#' hourly data otherwise
+#' @param drop.irrelvant.cols (boolean) remove irrelevant columns if `TRUE`,
+#' keep all columns otherwise (columns whose name start with 'irrelevant')
+#' @param col.names (chr) vector of column names for the output table
+#' (must match file content)
+#' @return (data.frame) table with numerical columns except for location (`chr`)
+#' and date (`Date` class for daily output or `POSIXct` class for hourly
+#' output). Columns: `location`, `date`, `Tmin` (min daily temperature),
+#' `Tavg` (average temperature), `Tmax` (max daily temperature), `humidity`,
+#' `precipitation`, `radiation`, `wind_speed` and
+#' `n_hours` (scope of the data as number of hours, e.g. used to calculate averages).
+#' @examples
+#' # Let us use example hourly and daily datasets:
+#' file.name.1 <- "20221215_isip_hourly_weather_data_export.xlsx"
+#' file.name.2 <- "20230330_isip_daily_weather_data_export.xlsx"
+#' path.1 <- system.file("extdata", file.name.1, package = "zeppr")
+#' path.2 <- system.file("extdata", file.name.2, package = "zeppr")
+#' out.path.1 <- tempfile(fileext = ".tsv.gz")
+#' out.path.2 <- tempfile(fileext = ".tsv.gz")
+#' # Copy hourly data to TSV:
+#' copy_isip_weather_data_to_tsv(path.1, out.path.1)
+#' # Copy daily data to TSV:
+#' copy_isip_weather_data_to_tsv(path.2, out.path.2, read.daily.data=TRUE)
+#' # Read hourly data but write daily data:
+#' copy_isip_weather_data_to_tsv(path.1, out.path.2, hourly.to.daily=TRUE)
+#' # Read hourly data:
+#' hourly.table <- readr::read_tsv(out.path.1, show_col_types = FALSE)
+#' head(hourly.table)
+#' # Read daily data:
+#' daily.table <- readr::read_tsv(out.path.2, show_col_types = FALSE)
+#' head(daily.table)
+#' @export
+# ==============================================================================
+copy_isip_weather_data_to_tsv <- function(
+    input.excel.path,
+    output.tsv.path,
+    append=FALSE,
+    read.daily.data=FALSE,
+    hourly.to.daily=FALSE,
+    drop.irrelvant.cols=TRUE,
+    col.names=c("ID", "date", "Tavg", "humidity", "precipitation", "radiation", "irrelevant", "wind_speed")
+){
+  isip.data <- read_isip_weather_data(
+    excel.path=input.excel.path,
+    read.daily.data=read.daily.data,
+    hourly.to.daily=hourly.to.daily,
+    drop.irrelvant.cols=drop.irrelvant.cols,
+    col.names=col.names
+    )
+  readr::write_tsv(isip.data, output.tsv.path, append=append)
+}
+
+
+# ==============================================================================
 #' Adds the Cumulative Sum of Growing Degree-Days to an ISIP Weather Data Table
 #'
 #' The ISIP data should be loaded by function [read_isip_weather_data()].
