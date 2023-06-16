@@ -1,4 +1,4 @@
-# ==============================================================================
+# ______________________________________________________________________________
 #' Creates an Input File for ISIP Weather Data Export Service
 #'
 #' Creates an Excel file to be used as input for the ISIP Weather Data Export
@@ -45,14 +45,15 @@ create_isip_weather_data_input_table <- function(
 }
 
 
-# ==============================================================================
+# ______________________________________________________________________________
 #' Reads ISIP Weather Data File
 #'
 #' Reads an ISIP hourly or daily weather export data file (Excel file;
 #' one row per hour or per day, respectively)
 #' and returns a data frame corresponding data. The function can convert hourly
 #' to daily data. In this case, the daily data is derived from the hourly data
-#' by averaging values per day. Minimum and maximum daily temperatures are
+#' by averaging or summing up the values per day (sum for precipitation and
+#' radiation, average otherwise). Minimum and maximum daily temperatures are
 #' derived from this calculation and are not available directly from the file.
 #' All sheets from the Excel file are processed and gathered in the same table.
 #' Within an ISIP Excel file, each sheet represents a particular geographical
@@ -95,7 +96,7 @@ create_isip_weather_data_input_table <- function(
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
-# ==============================================================================
+# ______________________________________________________________________________
 read_isip_weather_data <- function(
     excel.path,
     read.daily.data=FALSE,
@@ -136,13 +137,13 @@ read_isip_weather_data <- function(
       # dplyr::select("date", "location", tidyselect::everything()) %>%
       dplyr::group_by(.data$location, .data$date) %>%
       dplyr::summarise(
-        Tmin=min(.data$Tavg),
-        Tmax=max(.data$Tavg),
-        Tavg=mean(.data$Tavg),
-        humidity=mean(.data$humidity),
-        precipitation=mean(.data$precipitation),
-        radiation=mean(.data$radiation),
-        wind_speed=mean(.data$wind_speed),
+        Tmin=round(min(.data$Tavg), 2),
+        Tmax=round(max(.data$Tavg), 2),
+        Tavg=round(mean(.data$Tavg), 2),
+        humidity=round(mean(.data$humidity), 2),
+        precipitation=round(sum(.data$precipitation), 2),
+        radiation=round(sum(.data$radiation), 2),
+        wind_speed=round(mean(.data$wind_speed), 2),
         n_hours=dplyr::n(),
         .groups="drop"
       ) %>%
@@ -152,7 +153,7 @@ read_isip_weather_data <- function(
 }
 
 
-# ==============================================================================
+# ______________________________________________________________________________
 #' Copies ISIP Weather Data from Excel to TSV or TSV.GZ file
 #'
 #' Reads an ISIP hourly or daily weather export data file (Excel file;
@@ -206,7 +207,7 @@ read_isip_weather_data <- function(
 #' daily.table <- readr::read_tsv(out.path.2, show_col_types = FALSE)
 #' head(daily.table)
 #' @export
-# ==============================================================================
+# ______________________________________________________________________________
 copy_isip_weather_data_to_tsv <- function(
     input.excel.path,
     output.tsv.path,
@@ -227,7 +228,7 @@ copy_isip_weather_data_to_tsv <- function(
 }
 
 
-# ==============================================================================
+# ______________________________________________________________________________
 #' Adds the Cumulative Sum of Growing Degree-Days to an ISIP Weather Data Table
 #'
 #' The ISIP data should be loaded by function [read_isip_weather_data()].
@@ -310,7 +311,7 @@ copy_isip_weather_data_to_tsv <- function(
 #' @importFrom rlang :=
 #' @importFrom rlang .data
 #' @export
-# ==============================================================================
+# ______________________________________________________________________________
 mutate_isip_weather_with_cumsum_gdd <- function(
     isip.df,
     t.ceiling=30,
@@ -344,7 +345,7 @@ mutate_isip_weather_with_cumsum_gdd <- function(
         # max.per.day=max.per.day,
         values.to={{values.to}}
       ) %>%
-      dplyr::mutate({{values.to}}:= .data[[values.to]] * .data$counting) %>%
+      dplyr::mutate({{values.to}}:= round(.data[[values.to]] * .data$counting, 2)) %>%
       dplyr::select(-"year.198445789832", -"month.198445789832", -"day.198445789832b", -"counting")
   } else if(daily.data & noTMinValues){
     if(noTMinValues & show.warnings){message("zeppr::mutate_isip_weather_with_cumsum_gdd: no Tmin values")}
@@ -357,7 +358,7 @@ mutate_isip_weather_with_cumsum_gdd <- function(
         # max.per.day=max.per.day,
         values.to={{values.to}}
       ) %>%
-      dplyr::mutate({{values.to}}:= .data[[values.to]] * .data$counting) %>%
+      dplyr::mutate({{values.to}}:= round(.data[[values.to]] * .data$counting, 2)) %>%
       dplyr::select(-"year.198445789832", -"month.198445789832", -"day.198445789832b", -"counting")
   } else{
     isip.df <- isip.df %>%
@@ -369,7 +370,7 @@ mutate_isip_weather_with_cumsum_gdd <- function(
         # max.per.day=max.per.day,
         values.to={{values.to}}
       ) %>%
-      dplyr::mutate({{values.to}}:= .data[[values.to]] * .data$counting) %>%
+      dplyr::mutate({{values.to}}:= round(.data[[values.to]] * .data$counting, 2)) %>%
       dplyr::select(-"year.198445789832", -"month.198445789832", -"day.198445789832b", -"counting")
   }
   return(isip.df)

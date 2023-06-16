@@ -64,7 +64,7 @@ On this page, only examples and use cases are shown.
 normalized_cumsum                   # normalized cumulative sum
 growing_degree_days                 # growing degree days for 1 day
 mutate_cumsum_gdd                   # cumulative sum of growing degree-days
-read_isip_hourly_weather_data       # reads weather data from an ISIP Excel file
+read_isip_hourly_weather_data       # reads weather data from an ISIP Excel file (renamed read_isip_weather_data in devel version!)
 mutate_isip_weather_with_cumsum_gdd # cumulative sum of growing degree-days for ISIP weather data
 
 # In development:
@@ -73,6 +73,7 @@ mutate_isip_weather_with_cumsum_gdd # cumulative sum of growing degree-days for 
 get_dwd_stations_info               # retrieve online info on DWD weather stations
 closer_dwd_station                  # get closer DWD station from given coordinates
 get_dwd_station_data                # retrieve online data of a DWD weather station
+copy_isip_weather_data_to_tsv       # copy ISIP weather data from Excel to TSV 
 
 # temperature index (Klimatologische Kenntage)
 day_temp_index                      # classify single days by a temperature index
@@ -82,7 +83,7 @@ mutate_past_day_temp_indices        # count or classify multiple indices in a da
 ```
 
 
-## Simple use cases
+## Simple use cases for the development version
 
 ### Use case - Enrich Weather Data
 
@@ -94,7 +95,8 @@ file <- "20221215_isip_hourly_weather_data_export.xlsx"
 path <- system.file("extdata", file, package = "zeppr")
 
 # Read first rows and selected columns of the ISIP file
-daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)
+# daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)
+daily.table <- read_isip_weather_data(path, hourly.to.daily = TRUE)
 
 # Subset the data and edit some rows to create a fake second location
 daily.table <- daily.table[1:10, c("location", "date", "Tmin", "Tmax")]
@@ -348,12 +350,12 @@ hourly.table %>%
 ```
 
 
-### Read ISIP hourly weather data
+### Read ISIP weather data
 
-ISIP hourly weather data files are excel files with multiple sheets (one per 
-geographical location) containing each a table of hourly weather data 
+ISIP weather data files are excel files with multiple sheets (one per 
+geographical location) containing each a table of hourly or daily weather data 
 for the same date and time range. 
-Function `read_isip_hourly_weather_data()` reads an ISIP hourly weather data 
+Function `read_isip_weather_data()` reads an ISIP weather data 
 file and returns a data frame with either hourly or daily data.
 An example file is provided with this package at the following internal path: 
 
@@ -367,7 +369,7 @@ path <- system.file("extdata", file.name, package = "zeppr")
 
 ```{r}
 # Get hourly data:
-hourly.table <- read_isip_hourly_weather_data(path)
+hourly.table <- read_isip_weather_data(path)
 head(hourly.table)
 ```
 
@@ -376,7 +378,7 @@ head(hourly.table)
 
 ```{r}
 # Get daily data:
-daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)
+daily.table <- read_isip_weather_data(path, hourly.to.daily = TRUE)
 head(daily.table)
 ```
 
@@ -393,7 +395,7 @@ Processing hourly data:
 
 ```{r}
 # reads file and keeps only 5 first columns and 6 rows (6 hours)
-hourly.table <- read_isip_hourly_weather_data(path)[1:6,1:5]
+hourly.table <- read_isip_weather_data(path)[1:6,1:5]
 # adds cumulative growing degree-days per hour
 mutate_isip_weather_with_cumsum_gdd(hourly.table)
 ```
@@ -402,7 +404,7 @@ Processing daily data:
 
 ```{r}
 # reads file and keeps only 5 first columns and 6 rows (6 days)
-daily.table <- read_isip_hourly_weather_data(path, returns.daily.data=TRUE)[1:6,1:5]
+daily.table <- read_isip_weather_data(path, hourly.to.daily = TRUE)[1:6,1:5]
 # adds cumulative growing degree-days per day
 mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)
 # adds cumulative growing degree-days per day with floor value for

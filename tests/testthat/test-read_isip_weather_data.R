@@ -43,7 +43,7 @@ test_that("test of mutate_isip_weather_with_cumsum_gdd()",{
     c(4.48, 7.64, 13.89),
     round(mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE)$cumsum_gdd, 2))
   expect_equal(
-    c(4.55, 8.48, 14.73),
+    c(4.56, 8.48, 14.74),
     round(mutate_isip_weather_with_cumsum_gdd(daily.table, daily.data=TRUE, use.floor=TRUE)$cumsum_gdd, 2))
 
   # Test daily data

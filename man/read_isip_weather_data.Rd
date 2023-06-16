@@ -42,7 +42,8 @@ Reads an ISIP hourly or daily weather export data file (Excel file;
 one row per hour or per day, respectively)
 and returns a data frame corresponding data. The function can convert hourly
 to daily data. In this case, the daily data is derived from the hourly data
-by averaging values per day. Minimum and maximum daily temperatures are
+by averaging or summing up the values per day (sum for precipitation and
+radiation, average otherwise). Minimum and maximum daily temperatures are
 derived from this calculation and are not available directly from the file.
 All sheets from the Excel file are processed and gathered in the same table.
 Within an ISIP Excel file, each sheet represents a particular geographical
