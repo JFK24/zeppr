@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_emra_data.R
 \name{get_emra_predicted_weather}
 \alias{get_emra_predicted_weather}
-\title{Gets EMRA Online Predicted Weather Data}
+\title{Gets EMRA Predicted Interpolated Hourly Weather Data}
 \usage{
 get_emra_predicted_weather(lat, lon)
 }
@@ -12,18 +12,21 @@ get_emra_predicted_weather(lat, lon)
 \item{lon}{(dbl) longitude in degree of point of interest}
 }
 \value{
-(data.frame) a table of weather data defined by the following columns:
+(data.frame) a table of predicted hourly weather data defined by the following columns:
 date, doy (day of year), hourDB (hour), gridID, lat, lon,
-tl (Tavg 2m), tf (Tmin 2m), rr (precipitation mm), vv (max wind speed m/s),
-rg (max radiation J/cm),
-bKultur01, etpKultur01, etaKultur01, tschale, tapfel, tblatt
+tl (Tavg, 2m, °C), tf (Tmin, 2m, °C), rr (sum precipitation, mm), vv (max wind speed, m/s),
+rg (max global radiation, J/cm),
+bKultur01 (sum soil humidity 0-60cm under winter wheat, \%),
+etpKultur01 (sum of potential evaporation under winter wheat, mm),
+etaKultur01 (sum of current (or real?) evaporation under winter wheat, mm),
+tschale (max apple skin temperature °C), tapfel (max apple core temperature °C),
+tblatt  (min apple leaf temperature °C).
 See full documentation at
 https://emra.julius-kuehn.de/dokumente/upload/b916d_EMRA_Dokumentation__Webdienste.pdf
 }
 \description{
-Retrieves interpolated weather data from the EMRA online service (emra.julius-kuehn.de).
-}
-\details{
+EMRA is an online service (emra.julius-kuehn.de).
+Daily disruption of service expected between 9:30 and 10:00 am (MEZ/MESZ).
 Historical daily data is available from 1991 to yesterday.
 Predicted hourly data is provided for today and the next 7 days.
 Geographic coordinates must be from projection PSG::31467 (https://spatialreference.org/).

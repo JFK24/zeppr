@@ -73,9 +73,10 @@ create_isip_weather_data_input_table <- function(
 #' (must match file content)
 #' @return (data.frame) table with numerical columns except for location (`chr`)
 #' and date (`Date` class for daily output or `POSIXct` class for hourly
-#' output). Columns: `location`, `date`, `Tmin` (min daily temperature),
-#' `Tavg` (average temperature), `Tmax` (max daily temperature), `humidity`,
-#' `precipitation`, `radiation`, `wind_speed` and
+#' output). Columns: `location`, `date`, `Tmin` (min daily temperature 2m °C),
+#' `Tavg` (average temperature 2m °C), `Tmax` (max daily temperature 2m °C),
+#' `humidity` (relative humidity 2m %), `precipitation` (1m mm),
+#' `radiation` (global radiation 2m W/m2), `wind_speed` (2.5m m/s) and
 #' `n_hours` (scope of the data as number of hours, e.g. used to calculate averages).
 #' @examples
 #' # Let us use an example hourly dataset:

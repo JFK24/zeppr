@@ -32,9 +32,10 @@ keep all columns otherwise (columns whose name start with 'irrelevant')}
 \value{
 (data.frame) table with numerical columns except for location (\code{chr})
 and date (\code{Date} class for daily output or \code{POSIXct} class for hourly
-output). Columns: \code{location}, \code{date}, \code{Tmin} (min daily temperature),
-\code{Tavg} (average temperature), \code{Tmax} (max daily temperature), \code{humidity},
-\code{precipitation}, \code{radiation}, \code{wind_speed} and
+output). Columns: \code{location}, \code{date}, \code{Tmin} (min daily temperature 2m °C),
+\code{Tavg} (average temperature 2m °C), \code{Tmax} (max daily temperature 2m °C),
+\code{humidity} (relative humidity 2m \%), \code{precipitation} (1m mm),
+\code{radiation} (global radiation 2m W/m2), \code{wind_speed} (2.5m m/s) and
 \code{n_hours} (scope of the data as number of hours, e.g. used to calculate averages).
 }
 \description{

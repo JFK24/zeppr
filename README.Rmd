@@ -74,6 +74,8 @@ get_dwd_stations_info               # retrieve online info on DWD weather statio
 closer_dwd_station                  # get closer DWD station from given coordinates
 get_dwd_station_data                # retrieve online data of a DWD weather station
 copy_isip_weather_data_to_tsv       # copy ISIP weather data from Excel to TSV 
+get_emra_historical_weather         # retrieve online historical data from EMRA service
+get_emra_predicted_weather          # retrieve online predicted data from EMRA service
 
 # temperature index (Klimatologische Kenntage)
 day_temp_index                      # classify single days by a temperature index
