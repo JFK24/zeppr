@@ -144,8 +144,8 @@ past_day_temp_index <- function(date, t.min, t.max, n.days=1,
       .i=date,
       .f=function(x){
         my.rle <-rle(x)
-        if(sum(my.rle$values==1)>0){
-          return(max(my.rle$lengths[my.rle$values==1]))
+        if(sum(my.rle$values==1, na.rm=TRUE)>0){
+            return(max(my.rle$lengths[my.rle$values==1]))
         }
         return(0)
       },
