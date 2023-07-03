@@ -19,14 +19,19 @@
 #' or until yesterday if `NA` (the date of yesterday is the last available date)
 #' @return (data.frame) a table of historical daily weather data defined by the following columns
 #' (aggregation over hourly data):
-#' gridID, lat, lon, date, tmit (Tavg, 2m, °C), tmin (Tmin, 2m, °C), tmax (Tmax, 2m, °C),
+#' gridID, lat, lon, date,
+#' tmit (Tavg, 2m, °C), tmin (Tmin, 2m, °C), tmax (Tmax, 2m, °C),
 #' emin (Tmin, 5cm, °C), tfmin (min wet-bulb temperature, 2m, °C),
 #' rrsum (sum precipitation from RADOLAN, mm),
-#' rfmit (avg relative humidity, %), rrmax (max precipitation, mm),
-#' rrgt10mm (hours with precipitation > 10mm, h), radolansum (sum precipitation from RADOLAN, mm),
+#' rfmit (avg relative humidity, %),
+#' rrmax (max precipitation, mm),
+#' rrgt10mm (hours with precipitation > 10mm, h),
+#' radolansum (sum precipitation from RADOLAN, mm),
 #' radolanmax (max precipitation from RADOLAN, mm),
 #' radolangt10mm (hours with precipitation from RADOLAN > 10mm, h),
-#' windmit (avg wind speed, m/s), rgmax (max global radiation, J/cm), rgmit (avg global radiation, J/cm),
+#' windmit (avg wind speed, m/s),
+#' rgmax (max global radiation, J/cm),
+#' rgmit (avg global radiation, J/cm),
 #' sundur (sum sunlight duration, h),
 #' bKultur01 (sum soil humidity 0-60cm under winter wheat, %),
 #' etpKultur01 (sum of potential evaporation under winter wheat, mm),
@@ -43,6 +48,8 @@
 #'   # head(my.table[,1:8])
 #'   # my.table <- get_emra_historical_weather(lat, lon, end_date="1991-01-02")
 #'   # head(my.table[,1:8])
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
 #' @export
 # ==============================================================================
 get_emra_historical_weather <- function(lat, lon, start_date=NA, end_date=NA){
@@ -55,8 +62,9 @@ get_emra_historical_weather <- function(lat, lon, start_date=NA, end_date=NA){
   frame$date <- as.Date(frame$date)
   frame$lon <- lon
   frame$lat <- lat
-  frame <- dplyr::select(frame, "gridId", "lat", "lon", tidyselect::everything())
-  frame <- dplyr::arrange(frame, "date")
+  frame <- frame %>%
+    dplyr::select("gridId", "lat", "lon", tidyselect::everything()) %>%
+    dplyr::arrange(.data$date)
   return(frame)
 }
 
@@ -90,6 +98,8 @@ get_emra_historical_weather <- function(lat, lon, start_date=NA, end_date=NA){
 #'   lat <- 52.292031
 #'   # my.table <- get_emra_predicted_weather(lat, lon)
 #'   # head(my.table[,1:8])
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
 #' @export
 # ==============================================================================
 get_emra_predicted_weather <- function(lat, lon){
@@ -98,7 +108,8 @@ get_emra_predicted_weather <- function(lat, lon){
   frame <- jsonlite::fromJSON(httr::content(json_http, as="text"))
   frame$lon <- lon
   frame$lat <- lat
-  frame <- dplyr::select(frame, "gridId", "lat", "lon", tidyselect::everything())
-  frame <- dplyr::arrange(frame, "date", "hourDB")
+  frame <- frame %>%
+    dplyr::select("gridId", "lat", "lon", tidyselect::everything()) %>%
+    dplyr::arrange(.data$date, .data$hourDb)
   return(frame)
 }

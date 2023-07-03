@@ -22,20 +22,25 @@ or until yesterday if \code{NA} (the date of yesterday is the last available dat
 \value{
 (data.frame) a table of historical daily weather data defined by the following columns
 (aggregation over hourly data):
-gridID, lat, lon, date, tmit (Tavg, 2m, °C), tmin (Tmin, 2m, °C), tmax (Tmax, 2m, °C),
+gridID, lat, lon, date,
+tmit (Tavg, 2m, °C), tmin (Tmin, 2m, °C), tmax (Tmax, 2m, °C),
 emin (Tmin, 5cm, °C), tfmin (min wet-bulb temperature, 2m, °C),
 rrsum (sum precipitation from RADOLAN, mm),
-rfmit (avg relative humidity, \%), rrmax (max precipitation, mm),
-rrgt10mm (hours with precipitation > 10mm, h), radolansum (sum precipitation from RADOLAN, mm),
+rfmit (avg relative humidity, \%),
+rrmax (max precipitation, mm),
+rrgt10mm (hours with precipitation > 10mm, h),
+radolansum (sum precipitation from RADOLAN, mm),
 radolanmax (max precipitation from RADOLAN, mm),
 radolangt10mm (hours with precipitation from RADOLAN > 10mm, h),
-windmit (avg wind speed, m/s), rgmax (max global radiation, J/cm), rgmit (avg global radiation, J/cm),
+windmit (avg wind speed, m/s),
+rgmax (max global radiation, J/cm),
+rgmit (avg global radiation, J/cm),
 sundur (sum sunlight duration, h),
 bKultur01 (sum soil humidity 0-60cm under winter wheat, \%),
 etpKultur01 (sum of potential evaporation under winter wheat, mm),
 etaKultur01 (sum of current (or real?) evaporation under winter wheat, mm),
-tschale (max apple skin temperature °C), tapfel (max apple core temperature °C),
-tblatt  (min apple leaf temperature °C).
+tschale (max apple skin temperature, °C), tapfel (max apple core temperature, °C),
+tblatt  (min apple leaf temperature, °C).
 See full documentation at
 https://emra.julius-kuehn.de/dokumente/upload/b916d_EMRA_Dokumentation__Webdienste.pdf
 }

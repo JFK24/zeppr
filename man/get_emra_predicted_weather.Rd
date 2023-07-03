@@ -19,8 +19,8 @@ rg (max global radiation, J/cm),
 bKultur01 (sum soil humidity 0-60cm under winter wheat, \%),
 etpKultur01 (sum of potential evaporation under winter wheat, mm),
 etaKultur01 (sum of current (or real?) evaporation under winter wheat, mm),
-tschale (max apple skin temperature °C), tapfel (max apple core temperature °C),
-tblatt  (min apple leaf temperature °C).
+tschale (max apple skin temperature, °C), tapfel (max apple core temperature, °C),
+tblatt  (min apple leaf temperature, °C).
 See full documentation at
 https://emra.julius-kuehn.de/dokumente/upload/b916d_EMRA_Dokumentation__Webdienste.pdf
 }
