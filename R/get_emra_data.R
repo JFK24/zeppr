@@ -64,6 +64,7 @@ get_emra_historical_weather <- function(lat, lon, start_date=NA, end_date=NA){
   frame$lat <- lat
   frame <- frame %>%
     dplyr::select("gridId", "lat", "lon", tidyselect::everything()) %>%
+    dplyr::mutate(dplyr::across(.data$emin:.data$tapfel, as.numeric)) %>%
     dplyr::arrange(.data$date)
   return(frame)
 }
@@ -110,6 +111,7 @@ get_emra_predicted_weather <- function(lat, lon){
   frame$lat <- lat
   frame <- frame %>%
     dplyr::select("gridId", "lat", "lon", tidyselect::everything()) %>%
+    dplyr::mutate(dplyr::across(.data$doy:.data$tapfel, as.numeric)) %>%
     dplyr::arrange(.data$date, .data$hourDb)
   return(frame)
 }
