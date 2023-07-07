@@ -36,24 +36,26 @@ time duration values in days, no column added if \code{NA}}
 }
 \value{
 (data.frame) mutated table with an additional column for the normalized
-values, optionally with an other additional column for the interval time
-duration values in days
+values, optionally with an other additional column for the interval
+durations in days. Normalizing a NA value will result in a NA value.
+Duplicated data points (multiple rows with same date within a group)
+will produce Inf values.
 }
 \description{
-Trap data are numerical values collected at different time points (dates).
+Trap data are here numerical values recorded at different time points (dates).
 Interval length between time points, the exposition time duration (in days),
 may be irregular (e.g. every Mondays and Saturdays).
-Traps are set empty at the beginning of each interval (count=0).
-The end of each interval is a time point where values are collected (e.g. insect counts).
+Traps are initialized at the beginning of each interval (value=0).
+The end of each interval is a time point where values are recorded (e.g. insect counts).
 This function normalizes the values as averages per day during the exposition time.
 }
 \details{
 Important: the function can normalize values for multiple traps ONLY IF the
 input data frame is grouped accordingly (using function \code{dplyr::group_by()}).
-Otherwise, the function expects the data for a single trap.
+Otherwise (no groups), the function expects the data for a single trap.
 In any case, the function will likely bug with NA values,
-non ordered time points, or duplicate data points (multiple values associated
-with the same time point).
+or with duplicate data points (multiple values associated
+with the same time point). It is not necessary to order the data by date.
 }
 \examples{
 # given a simple data.frame with date and counts
@@ -61,7 +63,7 @@ data <- data.frame(
   date=as.Date(c("2022-01-01", "2022-01-05", "2022-01-06", "2022-01-11")),
   counts=c(12, 14, 20, 12))
 normalize_trap_data(data, date, counts)
-# Using magrittr's pipes
+# Using magrittr's pipes and keeping derived interval durations
 library(magrittr)
 data \%>\% normalize_trap_data(date, counts, ndays.to="n_days")
 }
