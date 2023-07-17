@@ -54,8 +54,8 @@
 # ==============================================================================
 get_emra_historical_weather <- function(lat, lon, start_date=NA, end_date=NA){
   yesterday <- format(Sys.Date()-1,"%Y-%m-%d")
-  start_date <- ifelse(is.na(start_date), "1991-01-01", start_date)
-  end_date <- ifelse(is.na(end_date), yesterday, end_date)
+  start_date <- ifelse(is.na(start_date) | start_date<"1991-01-01", "1991-01-01", start_date)
+  end_date <- ifelse(is.na(end_date) | end_date>yesterday, yesterday, end_date)
   url <- paste("https://synops.julius-kuehn.de/emra/xy", lon, lat, start_date, end_date, sep = "/")
   json_http <- httr::GET(url)
   frame <- jsonlite::fromJSON(httr::content(json_http, as="text"))
