@@ -50,6 +50,16 @@ devtools::install_github("JFK24/zeppr")
 ```
 
 
+## Build tools for package developer
+
+```{r}
+load_all()
+document()
+test()
+check()
+```
+
+
 ## Overview
 
 ### Documentation

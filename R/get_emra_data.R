@@ -17,8 +17,10 @@
 #' @param end_date (chr) Date formatted as YYYY-MM-DD (e.g. 2022-06-30).
 #' The function will return historical data until this date if properly defined,
 #' or until yesterday if `NA` (the date of yesterday is the last available date)
+#' @param retries (int) number of times to retry if an error occurs during download
+#' @param sleep_time (int) number of seconds between 2 retries
 #' @return (data.frame) a table of historical daily weather data defined by the following columns
-#' (aggregation over hourly data):
+#' (aggregation over hourly data) if successful, an empty data.frame otherwise:
 #' gridID, lat, lon, date,
 #' tmit (Tavg, 2m, °C), tmin (Tmin, 2m, °C), tmax (Tmax, 2m, °C),
 #' emin (Tmin, 5cm, °C), tfmin (min wet-bulb temperature, 2m, °C),
@@ -52,20 +54,62 @@
 #' @importFrom rlang .data
 #' @export
 # ==============================================================================
-get_emra_historical_weather <- function(lat, lon, start_date=NA, end_date=NA){
+# get_emra_historical_weather <- function(lat, lon, start_date=NA, end_date=NA){
+#   yesterday <- format(Sys.Date()-1,"%Y-%m-%d")
+#   start_date <- ifelse(is.na(start_date) | start_date<"1991-01-01", "1991-01-01", start_date)
+#   end_date <- ifelse(is.na(end_date) | end_date>yesterday, yesterday, end_date)
+#   url <- paste("https://synops.julius-kuehn.de/emra/xy", lon, lat, start_date, end_date, sep = "/")
+#   json_http <- httr::GET(url)
+#   frame <- jsonlite::fromJSON(httr::content(json_http, as="text"))
+#   frame$date <- as.Date(frame$date)
+#   frame$lon <- lon
+#   frame$lat <- lat
+#   frame <- frame %>%
+#     dplyr::select("gridId", "lat", "lon", tidyselect::everything()) %>%
+#     dplyr::mutate(dplyr::across(.data$emin:.data$tapfel, as.numeric)) %>%
+#     dplyr::arrange(.data$date)
+#   return(frame)
+# }
+
+get_emra_historical_weather <- function(lat, lon, start_date=NA, end_date=NA, retries=3, sleep_time=3){
   yesterday <- format(Sys.Date()-1,"%Y-%m-%d")
   start_date <- ifelse(is.na(start_date) | start_date<"1991-01-01", "1991-01-01", start_date)
   end_date <- ifelse(is.na(end_date) | end_date>yesterday, yesterday, end_date)
   url <- paste("https://synops.julius-kuehn.de/emra/xy", lon, lat, start_date, end_date, sep = "/")
-  json_http <- httr::GET(url)
-  frame <- jsonlite::fromJSON(httr::content(json_http, as="text"))
-  frame$date <- as.Date(frame$date)
-  frame$lon <- lon
-  frame$lat <- lat
-  frame <- frame %>%
-    dplyr::select("gridId", "lat", "lon", tidyselect::everything()) %>%
-    dplyr::mutate(dplyr::across(.data$emin:.data$tapfel, as.numeric)) %>%
-    dplyr::arrange(.data$date)
+  # retries=3
+  # sleep_time=3
+  # url <- "https://synops.julius-kuehn.de/emra/xy/13.211756/52.292031/1991-01-01/2018-12-31"
+  iteration <- 1
+  success <- FALSE
+  frame <- data.frame()
+  while(iteration<=retries & success==FALSE){
+    frame <- tryCatch(
+      {
+        json_http <- httr::GET(url)
+        jsonlite::fromJSON(httr::content(json_http, as="text"))
+      },
+      error = function(cond) {
+        message(paste("GET EMRA Error with:", url))
+        message("Here's the original error message:")
+        message(conditionMessage(cond))
+        Sys.sleep(sleep_time)
+        data.frame()
+      }
+    )
+    iteration <- iteration + 1
+    success <- ifelse(nrow(frame)==0, FALSE, TRUE)
+  }
+  if(success==TRUE){
+    frame$lon <- lon
+    frame$lat <- lat
+    frame <- frame %>%
+      dplyr::select("gridId", "lat", "lon", tidyselect::everything()) %>%
+      dplyr::mutate(dplyr::across(.data$emin:.data$tapfel, as.numeric)) %>%
+      dplyr::mutate(date=as.Date(date)) %>%
+      dplyr::arrange(.data$date)
+  } else{
+    message(paste("Failed to get EMRA weather data", url))
+  }
   return(frame)
 }
 

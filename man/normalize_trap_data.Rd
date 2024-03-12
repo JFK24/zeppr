@@ -11,7 +11,8 @@ normalize_trap_data(
   default.duration = 7,
   use.mean.days = TRUE,
   values.to = "norm_val",
-  ndays.to = NA
+  ndays.to = NA,
+  max.duration = NA
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ if \code{TRUE}, to \code{default.duration} otherwise}
 
 \item{ndays.to}{(chr) name of the new column to be added for the interval
 time duration values in days, no column added if \code{NA}}
+
+\item{max.duration}{(integer) maximal number of days between intervals if positive integer, no maximum otherwise}
 }
 \value{
 (data.frame) mutated table with an additional column for the normalized

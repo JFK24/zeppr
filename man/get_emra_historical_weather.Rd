@@ -4,7 +4,14 @@
 \alias{get_emra_historical_weather}
 \title{Gets EMRA Interpolated Historical Daily Weather Data}
 \usage{
-get_emra_historical_weather(lat, lon, start_date = NA, end_date = NA)
+get_emra_historical_weather(
+  lat,
+  lon,
+  start_date = NA,
+  end_date = NA,
+  retries = 3,
+  sleep_time = 3
+)
 }
 \arguments{
 \item{lat}{(dbl) latitude in degree of point of interest}
@@ -18,10 +25,14 @@ or from 1991-01-01 if \code{NA} (1991-01-01 is the first available date)}
 \item{end_date}{(chr) Date formatted as YYYY-MM-DD (e.g. 2022-06-30).
 The function will return historical data until this date if properly defined,
 or until yesterday if \code{NA} (the date of yesterday is the last available date)}
+
+\item{retries}{(int) number of times to retry if an error occurs during download}
+
+\item{sleep_time}{(int) number of seconds between 2 retries}
 }
 \value{
 (data.frame) a table of historical daily weather data defined by the following columns
-(aggregation over hourly data):
+(aggregation over hourly data) if successful, an empty data.frame otherwise:
 gridID, lat, lon, date,
 tmit (Tavg, 2m, °C), tmin (Tmin, 2m, °C), tmax (Tmax, 2m, °C),
 emin (Tmin, 5cm, °C), tfmin (min wet-bulb temperature, 2m, °C),
