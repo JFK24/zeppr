@@ -1,4 +1,4 @@
-test_that("multiplication works", {
+test_that("normalized values", {
   data <- data.frame(
     date=as.Date(c("2022-01-01", "2022-01-05", "2022-01-06", "2022-01-11")),
     counts=c(12, 14, 20, 12))

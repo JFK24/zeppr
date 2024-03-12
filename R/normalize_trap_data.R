@@ -55,14 +55,14 @@ normalize_trap_data <- function(
     dplyr::mutate(lag.198445789832 = dplyr::with_order(order_by = {{date}}, fun = dplyr::lag, x = {{date}})) %>%
     dplyr::mutate(diff.198445789832 = as.numeric({{date}} - .data$lag.198445789832)) %>%
     dplyr::mutate(
-      diff.198445789832 = if_else(
-        !is.na(diff.198445789832) & !is.na(max.duration) & max.duration>0,
-        ifelse(diff.198445789832>max.duration, max.duration, diff.198445789832),
-        diff.198445789832
+      diff.198445789832 = dplyr::if_else(
+        !is.na(.data$diff.198445789832) & !is.na(max.duration) & max.duration>0,
+        ifelse(.data$diff.198445789832>max.duration, max.duration, .data$diff.198445789832),
+        .data$diff.198445789832
       )
     ) %>%
     dplyr::mutate(med.198445789832=round(mean(.data$diff.198445789832, na.rm=T), 0)) %>%
-    dplyr::mutate(med.198445789832=ifelse(use.mean.days, med.198445789832, default.duration)) %>%
+    dplyr::mutate(med.198445789832=ifelse(use.mean.days, .data$med.198445789832, default.duration)) %>%
     dplyr::mutate(diff.198445789832=ifelse(.data$id.198445789832==1, .data$med.198445789832, .data$diff.198445789832)) %>%
     dplyr::mutate({{values.to}}:={{values}}/.data$diff.198445789832) %>%
     dplyr::select(-"id.198445789832", -"lag.198445789832", -"med.198445789832")
