@@ -83,6 +83,10 @@ n_leading_values_if                 # count leading values complying to a condit
 index_trailing_values_if            # index trailing values complying to a condition in a numerical vector
 n_trailing_values_if                # count trailing values complying to a condition in a numerical vector
 index_first_value_if                # index the first value complying to a condition in a numerical vector
+
+# geographic annotations
+map_nuts_name                       # annotate geographic points with administrative area names
+map_gisco_grid_id                   # annotate geographic points with Eurostat-GISCO grid IDs
 ```
 
 ## Simple use cases for the development version
