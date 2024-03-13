@@ -241,18 +241,22 @@ stations.info <- get_dwd_stations_info("air_temperature", timerange="recent")
 head(stations.info)
 ```
 
-We can search the id and distance in km of the closest station for given coordinates:
+We can search the id ('id') and distance in km ('dist') of the closest station for given coordinates and dates:
 ```{r}
-closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="id")
-closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="dist")
+closer_dwd_station(51.89, 10.54, start_date="2022-01-01", end_date="2022-07-30", stations_table=stations.info, return_string="id")
+closer_dwd_station(51.89, 10.54, start_date="2022-01-01", end_date="2022-07-30", stations_table=stations.info, return_string="dist")
 ```
 
 We can also process the table of locations as follows:
 ```{r}
 # With base R
-locations$station.id <- closer_dwd_station(locations$lat, locations$lon, 
+locations$station.id <- closer_dwd_station(
+  locations$lat, locations$lon, 
+  start_date="2022-01-01", end_date="2022-07-30",
   stations_table=stations.info, return_string = "id")
-locations$station.name <- closer_dwd_station(locations$lat, locations$lon, 
+locations$station.name <- closer_dwd_station(
+  locations$lat, locations$lon, 
+  start_date="2022-01-01", end_date="2022-07-30",
   stations_table=stations.info, return_string = "name")
 head(locations)
 ```
@@ -261,11 +265,11 @@ head(locations)
 # With dplyr and pipes from magrittr (%>%):
 locations %>% 
   mutate(station.id=closer_dwd_station(
-    lat, lon, stations_table=stations.info)) %>% 
+    lat, lon, "2022-01-01", "2022-07-30", stations_table=stations.info)) %>% 
   mutate(station.name=closer_dwd_station(
-    lat, lon, stations_table=stations.info, return_string = "name")) %>% 
+    lat, lon, "2022-01-01", "2022-07-30", stations_table=stations.info, return_string = "name")) %>% 
   mutate(station.distance=closer_dwd_station(
-    lat, lon, stations_table=stations.info, return_string = "dist"))
+    lat, lon, "2022-01-01", "2022-07-30", stations_table=stations.info, return_string = "dist"))
 ```
 
 Finally, we can get the weather data from a given station as follows:

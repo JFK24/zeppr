@@ -248,44 +248,48 @@ head(stations.info)
 #> # ℹ 1 more variable: bundesland <chr>
 ```
 
-We can search the id and distance in km of the closest station for given
-coordinates:
+We can search the id (‘id’) and distance in km (‘dist’) of the closest
+station for given coordinates and dates:
 
 ``` r
-closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="id")
-#> [1] NA
-closer_dwd_station(51.89, 10.54, stations_table=stations.info, return_string="dist")
-#> [1] NA
+closer_dwd_station(51.89, 10.54, start_date="2022-01-01", end_date="2022-07-30", stations_table=stations.info, return_string="id")
+#> [1] "02039"
+closer_dwd_station(51.89, 10.54, start_date="2022-01-01", end_date="2022-07-30", stations_table=stations.info, return_string="dist")
+#> [1] 2.34
 ```
 
 We can also process the table of locations as follows:
 
 ``` r
 # With base R
-locations$station.id <- closer_dwd_station(locations$lat, locations$lon, 
+locations$station.id <- closer_dwd_station(
+  locations$lat, locations$lon, 
+  start_date="2022-01-01", end_date="2022-07-30",
   stations_table=stations.info, return_string = "id")
-locations$station.name <- closer_dwd_station(locations$lat, locations$lon, 
+locations$station.name <- closer_dwd_station(
+  locations$lat, locations$lon, 
+  start_date="2022-01-01", end_date="2022-07-30",
   stations_table=stations.info, return_string = "name")
 head(locations)
-#>   loc   lat   lon station.id station.name
-#> 1   A 49.00  8.00       <NA>         <NA>
-#> 2   B 50.00  9.00       <NA>         <NA>
-#> 3   C 52.52 13.41       <NA>         <NA>
+#>   loc   lat   lon station.id     station.name
+#> 1   A 49.00  8.00      00377  Bergzabern, Bad
+#> 2   B 50.00  9.00      02480        Kahl/Main
+#> 3   C 52.52 13.41      00433 Berlin-Tempelhof
 ```
 
 ``` r
 # With dplyr and pipes from magrittr (%>%):
 locations %>% 
   mutate(station.id=closer_dwd_station(
-    lat, lon, stations_table=stations.info)) %>% 
+    lat, lon, "2022-01-01", "2022-07-30", stations_table=stations.info)) %>% 
   mutate(station.name=closer_dwd_station(
-    lat, lon, stations_table=stations.info, return_string = "name")) %>% 
+    lat, lon, "2022-01-01", "2022-07-30", stations_table=stations.info, return_string = "name")) %>% 
   mutate(station.distance=closer_dwd_station(
-    lat, lon, stations_table=stations.info, return_string = "dist"))
-#>   loc   lat   lon station.id station.name station.distance
-#> 1   A 49.00  8.00       <NA>         <NA>               NA
-#> 2   B 50.00  9.00       <NA>         <NA>               NA
-#> 3   C 52.52 13.41       <NA>         <NA>               NA
+    lat, lon, "2022-01-01", "2022-07-30", stations_table=stations.info, return_string = "dist"))
+#>   loc   lat   lon station.id     station.name station.distance
+#> 1   A 49.00  8.00      00377  Bergzabern, Bad            11.90
+#> 2   B 50.00  9.00      02480        Kahl/Main             7.17
+#> 3   C 52.52 13.41      00433 Berlin-Tempelhof             5.86
 ```
 
 Finally, we can get the weather data from a given station as follows:

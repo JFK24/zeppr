@@ -79,13 +79,29 @@ closer_dwd_station <- function(lat, lon,
                                start_date=NA, end_date=NA,
                                stations_table, return_string="id"){
 
+  # print(paste(lat, lon, start_date, end_date, return_string))
   my.end_date <- ifelse(is.na({{end_date}}), as.character(Sys.Date()-7), {{end_date}})
   my.start_date <- ifelse(is.na({{start_date}}), as.character(Sys.Date()-365*2), {{start_date}})
-  my_station_table_0 <- stations_table %>%
+  # print(paste(my.start_date, my.end_date))
+
+    my_station_table_0 <- stations_table %>%
     dplyr::filter(.data$start_date <= my.start_date) %>%
     dplyr::filter(.data$end_date >= my.end_date) %>%
     dplyr::mutate(start_date=as.character(.data$start_date)) %>%
     dplyr::mutate(end_date=as.character(.data$end_date))
+#
+    # my.start_date <- "2022-03-14"
+    # my.end_date <- "2024-03-06"
+    # sort(stations.info$end_date)
+    # stations.info %>%
+    #   dplyr::filter(.data$start_date <= my.start_date) %>%
+    #   dplyr::filter(.data$end_date >= my.end_date) %>%
+    #   # dplyr::mutate(start_date=as.character(.data$start_date)) %>%
+    #   # dplyr::mutate(end_date=as.character(.data$end_date)) %>%
+    #   tibble::tibble()
+#
+
+    # print(my_station_table_0)
 
   my.pairs <- data.frame(
     latitude=lat,
