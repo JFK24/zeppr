@@ -37,6 +37,16 @@ follows to get potential new features but also new potential bugs:
 devtools::install_github("JFK24/zeppr")
 ```
 
+## Build tools for package developer
+
+``` r
+# load_all()
+# document()
+# build_readme()
+# test()
+# check()
+```
+
 ## Overview
 
 ### Documentation
@@ -61,13 +71,18 @@ get_dwd_stations_info               # retrieve online info on DWD weather statio
 closer_dwd_station                  # get closer DWD station from given coordinates
 get_dwd_station_data                # retrieve online data of a DWD weather station
 copy_isip_weather_data_to_tsv       # copy ISIP weather data from Excel to TSV 
-get_emra_historical_weather         # retrieve online historical data from EMRA service
-get_emra_predicted_weather          # retrieve online predicted data from EMRA service
 
 # temperature index (Klimatologische Kenntage)
 day_temp_index                      # classify single days by a temperature index
 past_day_temp_index                 # count or classify past days by a temperature index
 mutate_past_day_temp_indices        # count or classify multiple indices in a data frame
+
+# vector indexing
+index_leading_values_if             # index leading values complying to a condition in a numerical vector
+n_leading_values_if                 # count leading values complying to a condition in a numerical vector
+index_trailing_values_if            # index trailing values complying to a condition in a numerical vector
+n_trailing_values_if                # count trailing values complying to a condition in a numerical vector
+index_first_value_if                # index the first value complying to a condition in a numerical vector
 ```
 
 ## Simple use cases for the development version
@@ -196,7 +211,7 @@ plot(data.table$cumsum_gdd,
      ylab="normalized cumulative sum of counts")
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 ### Use case 2 - DWD Weather Data
 

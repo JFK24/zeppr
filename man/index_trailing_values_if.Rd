@@ -32,7 +32,7 @@ comparing the values to a reference value using a common logical operator.
 }
 \examples{
 x <- c(1, NA, 7, 8, 4, 1, 2, NA, 4)
-index_trailing_values_if(x, "==", 4)
-index_trailing_values_if(x, "==", 4, keep.na.values=TRUE)
-index_trailing_values_if(x, ">=", 2, keep.na.values=TRUE)
+index_trailing_values_if(x=x, operator="==", ref.value=4)
+index_trailing_values_if(x=x, operator="==", ref.value=4, keep.na.values=TRUE)
+index_trailing_values_if(x=x, operator=">=", ref.value=2, keep.na.values=TRUE)
 }
