@@ -27,7 +27,7 @@ normalized_cumsum <- function(values, normalize=TRUE, na.replace=NA){
   if(!is.na(na.replace) & is.numeric(na.replace)){
     my.values[is.na(my.values)] <- na.replace
   }
-  if(normalize){
+  if(normalize & length(values)>1){
     return(cumsum(my.values) / sum(my.values, na.rm=TRUE))
   }
   return(cumsum(my.values))
