@@ -10,6 +10,13 @@
 #' @param keep.na.values (bool) NAs are left as is if TRUE, NAs in the leading group are kept otherwise
 #' @return (boolean) vector (same length as `x`): TRUE for consecutive leading values complying to the condition, FALSE otherwise
 #' @examples
+#' y <- c("2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04")
+#' y <- rev(y)
+#' x <- c(1, 7, 8, 4)
+#' index_leading_values_if(x=x, operator="==", ref.value=1, order.by=NA)
+#' index_leading_values_if(x=x, operator="<=", ref.value=1, order.by=NA)
+#' x[order(y)]
+#' index_leading_values_if(x=x, operator="<=", ref.value=7, order.by=y)
 #' x <- c(1, NA, 7, 8, 4, 1, 2, NA, 4)
 #' index_leading_values_if(x=x, operator="<", ref.value=8)
 #' index_leading_values_if(x=x, operator="<", ref.value=8, keep.na.values=TRUE)

@@ -34,6 +34,13 @@ The values are from a given numerical vector and the condition is tested by
 comparing the values to a reference value using a common logical operator.
 }
 \examples{
+y <- c("2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04")
+y <- rev(y)
+x <- c(1, 7, 8, 4)
+index_leading_values_if(x=x, operator="==", ref.value=1, order.by=NA)
+index_leading_values_if(x=x, operator="<=", ref.value=1, order.by=NA)
+x[order(y)]
+index_leading_values_if(x=x, operator="<=", ref.value=7, order.by=y)
 x <- c(1, NA, 7, 8, 4, 1, 2, NA, 4)
 index_leading_values_if(x=x, operator="<", ref.value=8)
 index_leading_values_if(x=x, operator="<", ref.value=8, keep.na.values=TRUE)
