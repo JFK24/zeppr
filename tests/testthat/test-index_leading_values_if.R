@@ -1,10 +1,16 @@
 test_that("index or count leading values", {
   x <- c(1, NA, 7, 8, 4, 1, 2, NA, 4)
+  y <- c(1,3,5,6,7,9,2,4,8)
   res.1 <- c(TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
   res.2 <- c(TRUE, NA, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)
+  res.3 <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE)
+  res.4 <- c(TRUE, NA, FALSE, FALSE, FALSE, FALSE, TRUE, NA, FALSE)
   expect_equal(res.1, index_leading_values_if(x=x, operator="<", ref.value=8))
   expect_equal(res.2, index_leading_values_if(x=x, operator="<", ref.value=8, keep.na.values=TRUE))
-  expect_equal(3, n_leading_values_if(x=x, operator="<", ref.value=8))
+  expect_equal(2, n_leading_values_if(x=x, operator="<", ref.value=8, keep.na.values=TRUE))
+  expect_equal(3, n_leading_values_if(x=x, operator="<", ref.value=8, keep.na.values=FALSE))
+  expect_equal(res.3, index_leading_values_if(x=x, operator="<=", ref.value=2, order.by=y, keep.na.values=FALSE))
+  expect_equal(res.4, index_leading_values_if(x=x, operator="<=", ref.value=2, order.by=y, keep.na.values=TRUE))
 })
 test_that("index or count trailing values", {
   x <- c(1, NA, 7, 8, 4, 1, 2, NA, 4)

@@ -5,3 +5,6 @@
 ^README\.Rmd$
 ^inst/extdata/stundenwerte_ST_00183_row.zip$
 tmp/
+rstudio_server_pass.txt
+.local
+.config

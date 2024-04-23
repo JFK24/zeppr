@@ -10,6 +10,7 @@ index_first_value_if(
   x,
   operator = "==",
   ref.value = 0,
+  order.by = NA,
   complete.to.end = FALSE
 )
 }
@@ -19,6 +20,8 @@ index_first_value_if(
 \item{operator}{(chr) type of comparison to perform among: "==", "<", "<=", ">", ">=", "is.na"}
 
 \item{ref.value}{(numeric) the reference value}
+
+\item{order.by}{(numeric) optional vector (same length as \code{x}): from which to take the ascending order to process \code{x}}
 
 \item{complete.to.end}{(bool) change the output by returning TRUE for the
 first value complying to the condition and also for all values after the first,
@@ -37,4 +40,10 @@ x <- c(1, NA, 7, 8, 4, 1, 2, NA, 4)
 index_first_value_if(x=x, operator=">", ref.value=6, complete.to.end=FALSE)
 index_first_value_if(x=x, operator=">", ref.value=6, complete.to.end=TRUE)
 index_first_value_if(x=x, operator="is.na")
+y <- c(1,3,5,6,7,9,2,4,8)
+x[order(y)]
+index_first_value_if(x=x[order(y)], operator=">", ref.value=6, order.by=NA, complete.to.end=FALSE)
+index_first_value_if(x=x[order(y)], operator=">", ref.value=6, order.by=NA, complete.to.end=TRUE)
+index_first_value_if(x=x, operator=">", ref.value=6, order.by=y, complete.to.end=FALSE)
+index_first_value_if(x=x, operator=">", ref.value=6, order.by=y, complete.to.end=TRUE)
 }

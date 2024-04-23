@@ -10,6 +10,7 @@ index_leading_values_if(
   x,
   operator = "==",
   ref.value = 0,
+  order.by = NA,
   keep.na.values = FALSE
 )
 }
@@ -19,6 +20,8 @@ index_leading_values_if(
 \item{operator}{(chr) type of comparison to perform among: "==", "<", "<=", ">", ">=", "is.na"}
 
 \item{ref.value}{(numeric) the reference value}
+
+\item{order.by}{(numeric) optional vector (same length as \code{x}): from which to take the ascending order to process \code{x}}
 
 \item{keep.na.values}{(bool) NAs are left as is if TRUE, NAs in the leading group are kept otherwise}
 }
@@ -34,4 +37,9 @@ comparing the values to a reference value using a common logical operator.
 x <- c(1, NA, 7, 8, 4, 1, 2, NA, 4)
 index_leading_values_if(x=x, operator="<", ref.value=8)
 index_leading_values_if(x=x, operator="<", ref.value=8, keep.na.values=TRUE)
+# Using a second vector y from which we take the order
+y <- c(1,3,5,6,7,9,2,4,8)
+x[order(y)]
+index_leading_values_if(x=x, operator="<=", ref.value=2, order.by=y, keep.na.values=FALSE)
+index_leading_values_if(x=x, operator="<=", ref.value=2, order.by=y, keep.na.values=TRUE)
 }

@@ -6,7 +6,13 @@
 The values are from a given numerical vector and the condition is tested by
 comparing the values to a reference value using a common logical operator.}
 \usage{
-n_leading_values_if(x, operator = "==", ref.value = 0, keep.na.values = FALSE)
+n_leading_values_if(
+  x,
+  operator = "==",
+  ref.value = 0,
+  order.by = NA,
+  keep.na.values = FALSE
+)
 }
 \arguments{
 \item{x}{(numeric) vector of numeric values}
@@ -14,6 +20,8 @@ n_leading_values_if(x, operator = "==", ref.value = 0, keep.na.values = FALSE)
 \item{operator}{(chr) type of comparison to perform among: "==", "<", "<=", ">", ">=", "is.na"}
 
 \item{ref.value}{(numeric) the reference value}
+
+\item{order.by}{(numeric) optional vector (same length as \code{x}): from which to take the ascending order to process \code{x}}
 
 \item{keep.na.values}{(bool) NAs are left as is if TRUE, NAs in the leading group are kept otherwise}
 }
@@ -29,4 +37,9 @@ comparing the values to a reference value using a common logical operator.
 x <- c(1, NA, 7, 8, 4, 1, 2, NA, 4)
 index_leading_values_if(x=x, operator="<", ref.value=8)
 n_leading_values_if(x=x, operator="<", ref.value=8)
+y <- c(1,3,5,6,7,9,2,4,8)
+x[order(y)]
+index_leading_values_if(x=x[order(y)], operator="<", ref.value=8, order.by=NA)
+index_leading_values_if(x=x, operator="<", ref.value=8, order.by=y)
+n_leading_values_if(x=x, operator="<", ref.value=8, order.by=y)
 }
