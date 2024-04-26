@@ -1,4 +1,84 @@
 # ==============================================================================
+#' Aggregates numerical values over a sliding and flexible time window.
+#'
+#' The numerical values are defined in an input vector.
+#' The values are iterated in the order given by a vector of corresponding dates.
+#' The aggregation uses available functions returning a single value such as sum, mean, max.
+#' The time window is defined from a date in the past to the currently iterated position in the vector.
+#' Examples of usage would be, e.g., to get the sum of values during
+#' the last N days (see `window_type`='before', `before_val` and `before_unit`),
+#' the average value since 1st January 2022 (see `window_type`='fixed', `fixed_date`),
+#' the sum since last 15th October (see `window_type`='start_values', `start_month`, `start_day`),
+#' or the maximun since the 101th day of the year (see `window_type`='yday', `start_yday`)..
+#' @param values (numeric) vector of values to aggregate
+#' @param times (Date) vector of dates indexing the vector of values
+#' @param expr (chr) R expression representing a function call to aggregate
+#' the values where '.' replaces the vector of values
+#' (e.g. '`sum(., na.rm=TRUE)`', '`mean(., na.rm=TRUE)`', `dplyr::first(.)`')
+#' @param window_type (chr) type of window among 'yday', 'start_values', 'before', and 'fixed'
+#' @param fixed_date (Date) window start date for 'fixed' window type
+#' @param before_val (int) window duration in units defined by `before_unit` for 'before' window type
+#' @param before_unit (chr) window duration unit among 'days', 'weeks', 'months' and 'years' for 'before' window type
+#' @param start_month (int) start month number for 'start_values' window type
+#' @param start_day (int) start day number in the start month for 'start_values' window type
+#' @param start_yday (int) start day of year number for 'yday' window type
+#' @param complete (bool) returns NA for incomplete windows if TRUE,
+#' proceed to computations ignoring missing window parts otherwise
+#' @return (numeric) a vector of same size as `values` where values at a given
+#' position (positions defined by dates in the `times` vector) are replaced by
+#' the aggregation statistic calculated on the time window.
+#' The time window is defined from a start to an end date. While sliding over the
+#' input `values` in the order defined by `times`, from the first to the last,
+#' the window end is the current position and the window start depends on `window_type` as follows.
+#' Window type `'fixed'`, the window starts at the date defined in `fixed_date`.
+#' Window type `'before'`, the window starts at a relative number (`before_val`)
+#' of time units (`before_unit`) before the current position.
+#' Window type `'start_values'`, the window starts at the last date (same year or year before)
+#' for which the month and day are equal to `start_month` and `start_day`, respectively.
+#' Window type `'yday'`, the window starts at the last date (same year or year before)
+#' for which the day of the year is equal to `start_yday`.
+#' @examples
+#' times <- as.Date(as.Date("2021-12-28"):as.Date("2022-01-03"))
+#' values <- c(10, 5, 8, 12, 6, 14, 11)
+#' expr="sum(., na.rm=TRUE)"
+#' time_slider(values, times, expr, "before", before_val='3', complete=TRUE)
+#' time_slider(values, times, expr, "before", before_val='3', complete=FALSE)
+#' time_slider(values, times, expr, "fixed", fixed_date='2021-12-29', complete=TRUE)
+#' time_slider(values, times, expr, "start_values", start_month=12, start_day=29, complete=TRUE)
+#' time_slider(values, times, expr, "yday", start_yday=363, complete=TRUE)
+#' @export
+# ==============================================================================
+time_slider <- function(values, times, expr="sum(., na.rm=TRUE)",
+                        window_type="yday",
+                        fixed_date=NA, before_val=NA, before_unit="days",
+                        start_yday=1, start_month=NA, start_day=NA, complete=TRUE){
+
+  if(before_unit %in% c("days", "weeks", "years")){before_unit=paste0("lubridate::", before_unit)}
+  start_month_chr <- sprintf("%02d", start_month)
+  start_day_chr <- sprintf("%02d", start_day)
+  if(inherits(fixed_date, "character")){fixed_date=as.Date(fixed_date)}
+
+  before_expr <- dplyr::case_when(
+    window_type=='yday' ~ "~ dplyr::if_else(lubridate::yday(.x)>=start_yday, as.Date(start_yday-1, origin=paste(lubridate::year(.x), '01', '01', sep='-')), as.Date(start_yday-1, origin=paste(lubridate::year(.x)-1, '01', '01', sep='-')))",
+    window_type=='start_values' ~ "~ dplyr::if_else(lubridate::month(.x)>start_month | (lubridate::month(.x)==start_month & lubridate::day(.x)>=start_day) , as.Date(paste(lubridate::year(.x), start_month_chr, start_day_chr, sep='-')), as.Date(paste(lubridate::year(.x)-1, start_month_chr, start_day_chr, sep='-')))",
+    window_type=='before' ~ paste0(before_unit, "(", before_val, ")"),
+    window_type=='fixed' ~ "~ dplyr::if_else(.x>=fixed_date, fixed_date, .x)"
+  )
+  fixed_date_res <- slider::slide_index_dbl(
+    .x=values,
+    .i=times,
+    .f= ~ eval(rlang::parse_expr(expr)),
+    .before = eval(rlang::parse_expr(before_expr)),
+    .complete = complete
+  )
+  if(window_type=='fixed'){
+    fixed_date_res[times<fixed_date] <- NA
+  }
+  return(fixed_date_res)
+}
+
+
+# ==============================================================================
 #' Binary Indexes consecutive leading values complying to a condition.
 #' The values are from a given numerical vector and the condition is tested by
 #' comparing the values to a reference value using a common logical operator.
