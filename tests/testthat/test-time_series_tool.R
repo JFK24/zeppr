@@ -19,6 +19,29 @@ test_that("time_sliders", {
   expect_equal(c(10, 15, 23, 12, 18, 32, 43, 47, 50, 51, 60, 75), res_yday$res_f)
   expect_equal(c(NA, NA, NA, 12, 18, 32, 43, 47, 50, 51, 60, 75), res_yday$res_t)
 
+  # window_type == fixed on a group data frame with different starts by group
+  times <- as.Date(as.Date("2021-12-25"):as.Date("2022-01-05"))
+  values <- c(10, 5, 8, 12, 6, 14, 11, 4, 3, 1, 9, 15)
+  expr="sum(., na.rm=TRUE)"
+  group_labels <- c(rep("A",6), rep("B", 6))
+  start_times <- c(rep(as.Date("2021-12-25"),6), rep(as.Date("2021-12-31"), 6))
+  df <- data.frame(
+    group=group_labels,
+    time=times,
+    start_time=start_times,
+    value=values)
+  res_fixed <- df %>%
+    dplyr::group_by(group) %>%
+    dplyr::mutate(my_sum=time_slider(
+      value,
+      time,
+      expr,
+      "fixed",
+      fixed_date=start_time,
+      complete=TRUE)
+    )
+  expect_equal(c(10, 15, 23, 35, 41, 55, 11, 15, 18, 19, 28, 43), res_fixed$my_sum)
+
   # window_type == fixed
   my.date.1 <- "2021-12-27"
   my.date.2 <- "2022-01-03"
