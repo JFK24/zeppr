@@ -85,8 +85,12 @@ get_jki_gridid <- function(x, y, crs = 4326){
 #'     jansen_api_url <- secrets[secrets$key=="jansen_api_url",]$value
 #'     before_yesterday <- format(Sys.Date()-2,"%Y-%m-%d")
 #'     # Requests
-#'     get_jansen_historical_weather(52.292031, 13.211756, start_date=before_yesterday)
-#'     get_jansen_historical_weather(52.292031, 13.211756, end_date="1990-01-03")
+#'     get_jansen_historical_weather(
+#'       52.292031, 13.211756, start_date=before_yesterday,
+#'       url=jansen_api_url)
+#'     get_jansen_historical_weather(
+#'     52.292031, 13.211756, end_date="1990-01-03",
+#'     url=jansen_api_url)
 #'   }
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
