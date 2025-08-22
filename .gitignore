@@ -44,5 +44,5 @@ renv.lock
 .local
 .config
 compose.yml
-.secrets.tsv
+secrets.tsv
 ISIP.charts.token.txt
