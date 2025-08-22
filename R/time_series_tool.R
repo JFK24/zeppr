@@ -5,7 +5,7 @@
 #' The values are iterated in the order given by a vector of corresponding dates.
 #' The aggregation uses available functions returning a single value such as sum, mean, max.
 #' The time window is defined from a date in the past to the currently iterated position in the vector.
-#' Examples of usage would be, e.g., to get the sum of values during
+#' Examples of usage would be to get the sum of values during
 #' the last N days (see `window_type`='before', `before_val` and `before_unit`),
 #' the average value since 1st January 2022 (see `window_type`='fixed', `fixed_date`),
 #' the sum since last 15th October (see `window_type`='start_values', `start_month`, `start_day`),
@@ -16,7 +16,10 @@
 #' the values where '.' replaces the vector of values
 #' (e.g. '`sum(., na.rm=TRUE)`', '`mean(., na.rm=TRUE)`', `dplyr::first(.)`')
 #' @param window_type (chr) type of window among 'yday', 'start_values', 'before', and 'fixed'
-#' @param fixed_date (Date) window start date for 'fixed' window type
+#' @param fixed_date (Date) window start date for 'fixed' window type.
+#' If provided as a vector of Date objects, the first object is selected as `fixed_date`.
+#' It means that for grouped data frames, a column of starting dates can be passed
+#' with different starting dates per groups (still, only the first date per group will be used).
 #' @param before_val (int) window duration in units defined by `before_unit` for 'before' window type
 #' @param before_unit (chr) window duration unit among 'days', 'weeks', 'months' and 'years' for 'before' window type
 #' @param start_month (int) start month number for 'start_values' window type
@@ -46,6 +49,16 @@
 #' time_slider(values, times, expr, "fixed", fixed_date='2021-12-29', complete=TRUE)
 #' time_slider(values, times, expr, "start_values", start_month=12, start_day=29, complete=TRUE)
 #' time_slider(values, times, expr, "yday", start_yday=363, complete=TRUE)
+#' # Flexible start dates by groups in grouped data frames
+#' group_labels <- c(rep("A",4), rep("B", 3))
+#' start_times <- c(rep(as.Date("2021-12-28"),4), rep(as.Date("2022-01-01"), 3))
+#' df <- data.frame(group=group_labels, time=times, start_time=start_times, value=values)
+#' library(magrittr)
+#' df %>%
+#'   dplyr::group_by(group) %>%
+#'   dplyr::mutate(my_sum=time_slider(
+#'   value, time, expr, "fixed", fixed_date=start_time, complete=TRUE))
+#' @importFrom magrittr %>%
 #' @export
 # ==============================================================================
 time_slider <- function(values, times, expr="sum(., na.rm=TRUE)",
@@ -57,6 +70,11 @@ time_slider <- function(values, times, expr="sum(., na.rm=TRUE)",
   start_month_chr <- sprintf("%02d", start_month)
   start_day_chr <- sprintf("%02d", start_day)
   if(inherits(fixed_date, "character")){fixed_date=as.Date(fixed_date)}
+  if(length(fixed_date)>1){
+    # fixed_date=median(fixed_date, na.rm=TRUE)
+    fixed_date=dplyr::first(fixed_date)
+    # print(fixed_date)
+  }
 
   before_expr <- dplyr::case_when(
     window_type=='yday' ~ "~ dplyr::if_else(lubridate::yday(.x)>=start_yday, as.Date(start_yday-1, origin=paste(lubridate::year(.x), '01', '01', sep='-')), as.Date(start_yday-1, origin=paste(lubridate::year(.x)-1, '01', '01', sep='-')))",

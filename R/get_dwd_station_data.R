@@ -147,19 +147,20 @@ read_dwd_station_data_file <- function(station_zip_path){
 #'  station_id, timestamp, and a variable number of columns depending on the file.
 #' All columns are of type chr except timestamp of type `POSIXct`.
 #' @examples
-#' head(get_dwd_station_data(station_id="04719", category="air_temperature", timerange="historical"))
-#' head(get_dwd_station_data(station_id="00044", category="air_temperature"))
-#' head(get_dwd_station_data(station_id="00183", category="solar"))
-#' head(get_dwd_station_data(station_id="00044", category="dew_point", timerange="historical"))
+#' # head(get_dwd_station_data(station_id="04719", category="air_temperature", timerange="historical"))
+#' # head(get_dwd_station_data(station_id="00044", category="air_temperature"))
+#' # head(get_dwd_station_data(station_id="00183", category="solar"))
+#' # head(get_dwd_station_data(station_id="00044", category="dew_point", timerange="historical"))
 #' @export
 # ==============================================================================
 get_dwd_station_data <- function(station_id="00044", category="air_temperature", timerange="recent"){
+  category="wind"
   # category="air_temperature"
-  # station_id="00044"
-  # timerange="recent"
-  # timerange="historical"
-  # category="solar"
-  # station_id="00183"
+  station_id="00044"
+  timerange="recent"
+  timerange="historical"
+  category="solar"
+  station_id="00183"
   code <- dwd_category_code(category)
   if(is.na(code)){
     message("get_dwd_station_data(): unsupported category!")
@@ -177,6 +178,10 @@ get_dwd_station_data <- function(station_id="00044", category="air_temperature",
   web.page <- RCurl::getURL(paste0(station_data_url, "/"),verbose=F)
   ftp.files <- XML::getHTMLLinks(web.page)
   station.file.name <- grep(paste(code, station_id, sep="_"), ftp.files, value = T)[1]
+  if(station.file.name == "NA"){
+    message(paste("get_dwd_station_data(): no online link for station category:", station_id, category))
+    return(data.frame())
+  }
   station_data_url <- paste0(station_data_url, "/", station.file.name)
   print(station_data_url)
 

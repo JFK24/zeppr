@@ -42,5 +42,7 @@ tmp/
 renv.lock
 .cache
 .local
-rstudio_server_pass.txt
 .config
+compose.yml
+.secrets.tsv
+ISIP.charts.token.txt

@@ -5,7 +5,6 @@
 #' Daily disruption of service expected between 9:30 and 10:00 am (MEZ/MESZ).
 #' Historical daily data is available from 1991 to yesterday.
 #' Predicted hourly data is provided for today and the next 7 days.
-#' Geographic coordinates must be from projection PSG::31467 (https://spatialreference.org/).
 #' The daily and hourly data is provided as raster data. A raster has an area of
 #' 1 x 1km2 and is defined within a grid over Germany.
 #'

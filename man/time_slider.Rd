@@ -29,7 +29,10 @@ the values where '.' replaces the vector of values
 
 \item{window_type}{(chr) type of window among 'yday', 'start_values', 'before', and 'fixed'}
 
-\item{fixed_date}{(Date) window start date for 'fixed' window type}
+\item{fixed_date}{(Date) window start date for 'fixed' window type.
+If provided as a vector of Date objects, the first object is selected as \code{fixed_date}.
+It means that for grouped data frames, a column of starting dates can be passed
+with different starting dates per groups (still, only the first date per group will be used).}
 
 \item{before_val}{(int) window duration in units defined by \code{before_unit} for 'before' window type}
 
@@ -64,7 +67,7 @@ The numerical values are defined in an input vector.
 The values are iterated in the order given by a vector of corresponding dates.
 The aggregation uses available functions returning a single value such as sum, mean, max.
 The time window is defined from a date in the past to the currently iterated position in the vector.
-Examples of usage would be, e.g., to get the sum of values during
+Examples of usage would be to get the sum of values during
 the last N days (see \code{window_type}='before', \code{before_val} and \code{before_unit}),
 the average value since 1st January 2022 (see \code{window_type}='fixed', \code{fixed_date}),
 the sum since last 15th October (see \code{window_type}='start_values', \code{start_month}, \code{start_day}),
@@ -79,4 +82,13 @@ time_slider(values, times, expr, "before", before_val='3', complete=FALSE)
 time_slider(values, times, expr, "fixed", fixed_date='2021-12-29', complete=TRUE)
 time_slider(values, times, expr, "start_values", start_month=12, start_day=29, complete=TRUE)
 time_slider(values, times, expr, "yday", start_yday=363, complete=TRUE)
+# Flexible start dates by groups in grouped data frames
+group_labels <- c(rep("A",4), rep("B", 3))
+start_times <- c(rep(as.Date("2021-12-28"),4), rep(as.Date("2022-01-01"), 3))
+df <- data.frame(group=group_labels, time=times, start_time=start_times, value=values)
+library(magrittr)
+df \%>\%
+  dplyr::group_by(group) \%>\%
+  dplyr::mutate(my_sum=time_slider(
+  value, time, expr, "fixed", fixed_date=start_time, complete=TRUE))
 }
