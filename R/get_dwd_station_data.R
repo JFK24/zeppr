@@ -154,13 +154,13 @@ read_dwd_station_data_file <- function(station_zip_path){
 #' @export
 # ==============================================================================
 get_dwd_station_data <- function(station_id="00044", category="air_temperature", timerange="recent"){
-  category="wind"
+  # category="wind"
   # category="air_temperature"
-  station_id="00044"
-  timerange="recent"
-  timerange="historical"
-  category="solar"
-  station_id="00183"
+  # station_id="00044"
+  # timerange="recent"
+  # timerange="historical"
+  # category="solar"
+  # station_id="00183"
   code <- dwd_category_code(category)
   if(is.na(code)){
     message("get_dwd_station_data(): unsupported category!")
