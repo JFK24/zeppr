@@ -15,3 +15,5 @@ tmp/
 compose.yml
 secrets.tsv
 ISIP.charts.token.txt
+.sh_history
+.lesshst

@@ -43,6 +43,8 @@ renv.lock
 .cache
 .local
 .config
+.sh_history
+.lesshst
 compose.yml
 secrets.tsv
 ISIP.charts.token.txt

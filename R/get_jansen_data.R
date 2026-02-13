@@ -106,10 +106,11 @@ get_jansen_historical_weather <- function(lat, lon, start_date=NA, end_date=NA, 
   success <- FALSE
   frame <- data.frame()
   while(iteration<=retries & success==FALSE){
-    frame <- tryCatch(
-      {
+    frame <- tryCatch({
         json_http <- httr::GET(url)
-        jsonlite::fromJSON(httr::content(json_http, as="text"))
+        suppressMessages({
+          jsonlite::fromJSON(httr::content(json_http, as="text"))
+        })
       },
       error = function(cond) {
         message(paste("GET JANSEN Error with:", url))
